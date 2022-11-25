@@ -1,6 +1,6 @@
 # flask-tasks-docker
 
-This is an generic ready-to-run Flask RESTful API written in Python that can receive task requests with some arguments, run some logic with the arguments provided and store the results on a SQL database. The results can then be retrieved from the API. The processing instances can be scaled according to your needs using docker.
+This is a generic ready-to-run Flask RESTful API written in Python that can receive task requests with some arguments, run some logic with the arguments provided and store the results on a SQL database. The results can then be retrieved from the API. The processing instances can be scaled according to your needs using docker.
 
 ## Main features
 
@@ -47,11 +47,11 @@ Below, you have an example of the environment variables for ```api```. Copy the 
 ```yaml
 services:
   api:
-	  environment:
-      - DATABASE_URL: 'postgres://[user]:[password]@[database_server_ip]:[port]/[database_name]'
-      - BACKEND_URL: 'https://[backend_server_ip]:[port]'
-      - FRONTEND_URL: 'https://[frontend_server_ip]:[port]'
-      - MAX_TASK_TIME: '[time_in_seconds]'
+    environment:
+      - DATABASE_URL: "postgres://[user]:[password]@[database_server_ip]:[port]/[database_name]"
+      - BACKEND_URL: "https://[backend_server_ip]:[port]"
+      - FRONTEND_URL: "https://[frontend_server_ip]:[port]"
+      - MAX_TASK_TIME: "[time_in_seconds]"
 ```
 If you want your frontend app to connect with the API, then fill the ```FRONTEND_URL``` and ```BACKEND_URL``` for the JavaScript CORS to work.
 
