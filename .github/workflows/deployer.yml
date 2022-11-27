@@ -1,12 +1,13 @@
-name: docker-updater
+name: deployer
 
 on:
   push:
     branches:
       - 'master'
-
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 jobs:
-  docker:
+  docker-push:
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -46,3 +47,16 @@ jobs:
           context: ./janitor
           push: true
           tags: brenopelegrin/flask-tasks-janitor:latest
+  fly-deploy:
+    name: Deploy app on Fly
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - 
+        name: Set up checkout
+        uses: actions/checkout@v3
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      - 
+        name: Run flyctl deploy
+        run: flyctl deploy --remote-only
