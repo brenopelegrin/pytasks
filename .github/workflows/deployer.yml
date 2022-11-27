@@ -49,6 +49,7 @@ jobs:
           tags: brenopelegrin/flask-tasks-janitor:latest
   fly-deploy:
     name: Deploy app on Fly
+    needs: docker-push
     runs-on: ubuntu-latest
     environment: production
     steps:
