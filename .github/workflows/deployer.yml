@@ -62,11 +62,11 @@ jobs:
         name: Run flyctl deploy
         with:
           context: ./api
-        run: flyctl deploy --remote-only
+          run: flyctl deploy --remote-only
   fly-deploy-handler:
     name: Deploy Handler on Fly
-    needs: docker-push
     runs-on: ubuntu-latest
+    needs: docker-push
     environment: production
     steps:
       - 
@@ -78,5 +78,5 @@ jobs:
         name: Run flyctl deploy
         with:        
           context: ./handler
-        run: flyctl deploy --remote-only
+          run: flyctl deploy --remote-only
 
