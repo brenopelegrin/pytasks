@@ -1,6 +1,4 @@
-# fly.toml file generated for flask-tasks-docker on 2022-11-27T01:50:26-03:00
-
-app = "flask-tasks-docker"
+app = "flask-tasks-api"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
