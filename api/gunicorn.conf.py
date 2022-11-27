@@ -3,4 +3,4 @@ import os
 #errorlog = 'gunicorn.error.log'
 workers = int(os.getenv('GUNICORN_WORKERS'))
 threads = int(os.getenv('GUNICORN_THREADS'))
-#bind = '127.0.0.1:80'
+bind = '_local_ip.internal:8000'
