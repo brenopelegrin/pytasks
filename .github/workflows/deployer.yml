@@ -8,6 +8,7 @@ env:
   FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 jobs:
   docker-push:
+    name: Build API, Handler and Janitor images and push to Dockerhub
     runs-on: ubuntu-latest
     environment: production
     steps:
