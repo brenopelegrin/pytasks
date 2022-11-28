@@ -10,7 +10,8 @@ jobs:
   docker-push:
     name: Build docker images & push
     runs-on: ubuntu-latest
-    environment: production
+    environment: 
+      name: production
     steps:
       -
         name: Checkout
@@ -52,7 +53,9 @@ jobs:
     name: Deploy API on Fly
     runs-on: ubuntu-latest
     needs: docker-push
-    environment: production
+    environment:
+      name: production
+      url: https://flask-tasks-api.fly.dev
     steps:
       - 
         name: Set up checkout
@@ -67,7 +70,9 @@ jobs:
     name: Deploy Handler on Fly
     runs-on: ubuntu-latest
     needs: docker-push
-    environment: production
+    environment:
+      name: production
+      url: https://flask-tasks-api.fly.dev
     steps:
       - 
         name: Set up checkout
