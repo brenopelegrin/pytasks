@@ -29,21 +29,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push API
+        name: 🚀 Build and push API
         uses: docker/build-push-action@v3
         with:
           context: ./api
           push: true
           tags: brenopelegrin/flask-tasks-api:latest
       -
-        name: Build and push Handler
+        name: 🚀 Build and push Handler
         uses: docker/build-push-action@v3
         with:
           context: ./handler
           push: true
           tags: brenopelegrin/flask-tasks-handler:latest
       -
-        name: Build and push Janitor
+        name: 🚀 Build and push Janitor
         uses: docker/build-push-action@v3
         with:
           context: ./janitor
@@ -63,7 +63,7 @@ jobs:
       - name: Set up flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
       - 
-        name: Run flyctl deploy
+        name: 🚀 Run flyctl deploy
         working-directory: ./api
         run: flyctl deploy --remote-only
   fly-deploy-handler:
@@ -80,7 +80,7 @@ jobs:
       - name: Set up flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
       -           
-        name: Run flyctl deploy
+        name: 🚀 Run flyctl deploy
         working-directory: ./handler
         run: flyctl deploy --remote-only
           
