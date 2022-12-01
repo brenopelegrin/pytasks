@@ -11,6 +11,7 @@ import io
 from server import frontend_url
 from datetime import datetime
 import os
+max_storage_time = float(os.getenv('MAX_STORAGE_TIME'))
 
 def abort_if_task_doesnt_exist(task_id):
     exists = db.session.query(Task.id).filter_by(id=task_id).scalar() is not None
@@ -30,7 +31,7 @@ class NewTask(Resource):
         #abort_if_tasktype_doesnt_exist(args["type"])
 
         ts_current = time.time()
-        task = Task(required_arg=args["required_arg"], args=args, status="waiting", created=ts_current, expire=ts_current+max_task_time)
+        task = Task(required_arg=args["required_arg"], args=args, status="waiting", created=ts_current, expire=ts_current+max_storage_time)
         
         db.session.add(task)
         db.session.commit()
