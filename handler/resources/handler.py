@@ -2,9 +2,15 @@ from models import *
 import time
 import werkzeug
 import os
+import random
 max_task_time = float(os.getenv('MAX_TASK_TIME'))
+list_of_delays = [0.01, 0.1, 0.2, 0.3, 1, 2, 3, 4]
 
 def ExecuteWhenRunningTask(task_id, args):
+    if 'type' in args.keys():
+        if args['type'] == 'add':
+            return args['x'] + args['y']
+    time.sleep(random.choice(list_of_delays))
     return "none"
 
 def RunTask(task_id, args):
@@ -35,7 +41,7 @@ def TaskHandler():
                 task.result = result
                 task.status = "done"
                 db.session.commit()
-
+    
             except:
                 
                 print(f"[handler] task {current_id} failed to run", flush=True)

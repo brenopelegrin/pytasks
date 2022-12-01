@@ -12,17 +12,43 @@ from server import frontend_url
 from datetime import datetime
 import os
 max_task_time = float(os.getenv('MAX_TASK_TIME'))
+tasktypes = {
+    "tipo1": 
+        {
+            "dt": 1
+        }, 
+    "tipo2":
+        {
+            "dt": 2
+        }
+    "tipo3":
+        {
+            "dt": 3
+        },
+    }
 
 def abort_if_task_doesnt_exist(task_id):
     exists = db.session.query(Task.id).filter_by(id=task_id).scalar() is not None
     if exists != True:
         abort(404, message=f'task id {task_id} is not registered')
+        
+def abort_if_tasktype_doesnt_exist(tasktype):
+    if tasktype not in tasktypes:
+        abort(404, message=f'task type {tasktype} doesnt exist')
+
 
 class NewTask(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('required_arg', required=True, type=str, help='You need to inform required_arg', location='json')
+        parser.add_argument('type', type=str)
+        parser.add_argument('x', type=int)
+        parser.add_argument('y', type=int)
+        #parser.add_argument('type', required=True, type=str, help='You need to inform tasktype', location='json')
         args = parser.parse_args()
+
+        #abort_if_tasktype_doesnt_exist(args["type"])
+
         ts_current = time.time()
         task = Task(required_arg=args["required_arg"], args=args, status="waiting", created=ts_current, expire=ts_current+max_task_time)
         
