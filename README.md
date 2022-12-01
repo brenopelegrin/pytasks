@@ -2,6 +2,8 @@
 
 This is a generic ready-to-run Flask RESTful API written in Python that can receive task requests with some arguments, run some logic with the arguments provided and store the results on a SQL database. The results can then be retrieved from the API. The processing instances can be scaled according to your needs using docker.
 
+⏳ **Upcoming in v2.0**: the app will be redesigned to manage the tasks using **Celery + RabbitMQ + PostgreSQL**
+
 ## Main features
 
 - You can scale multiple task handlers that can **proccess tasks in parallel**
