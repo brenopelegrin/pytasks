@@ -5,7 +5,7 @@ import time
 import random
 import string
 
-interval = 0.001
+interval = 5
 
 api_url = os.getenv('API_URL')
 request_count = 1
@@ -16,13 +16,16 @@ def get_random_string(length):
     return result_str
 
 while True:
+    while request_count <= 100:
+        data = {
+            "required_arg": get_random_string(16)
+        }
 
-    data = {
-        "required_arg": get_random_string(16)
-    }
-
-    r = requests.post(url=api_url, json=data)
-    print(r.json())
+        r = requests.post(url=api_url, json=data)
+        print(f'requisicao n {request_count}')
+        print(r.json())
+        request_count+=1
+    request_count=1
     time.sleep(interval)
 
 
