@@ -11,7 +11,6 @@ import io
 from server import frontend_url
 from datetime import datetime
 import os
-max_task_time = float(os.getenv('MAX_TASK_TIME'))
 
 def abort_if_task_doesnt_exist(task_id):
     exists = db.session.query(Task.id).filter_by(id=task_id).scalar() is not None
