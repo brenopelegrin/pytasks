@@ -3,20 +3,15 @@ import time
 import werkzeug
 import os
 import random
-list_of_delays = [0.01, 0.1, 0.2, 0.3, 1, 2, 3, 4]
+from resources.tasks import tasks
+tasklist = tasks.list
 
-def ExecuteWhenRunningTask(task_id, args):
-    if 'type' in args.keys():
-        if args['type'] == 'add':
-            return args['x'] + args['y']
-    time.sleep(random.choice(list_of_delays))
-    return "none"
-
-def RunTask(task_id, args):
-    print(f"[handler] task {task_id} is running", flush=True)
+def RunTask(task_id, type, args):
+    print(f"[handler] task {task_id} (type {type}) is running", flush=True)
 
     #do some logic here
-    result_of_execution = ExecuteWhenRunningTask(task_id, args)
+    task_func = tasklist[type]['func']
+    result_of_execution = task_func(**args)
 
     return {"message": result_of_execution}
 
@@ -28,25 +23,28 @@ def TaskHandler():
         if task != None:
             current_id = task.id
             current_args = task.args
-            print(f'[handler] task {current_id} is ready to run.', flush=True)
-            task.status = "running"
-            db.session.commit()
-
-            try:
-                result = RunTask(task_id=current_id, args=current_args)
-                print(f"[handler] task {current_id} is finished", flush=True)
-
-                task = db.session.query(Task).filter_by(id=current_id).with_for_update().first()
-                task.result = result
-                task.status = "done"
+            current_type = task.type
+            if current_type in tasklist.keys():
+                print(f'[handler] task {current_id} (type {current_type}) is ready to run.', flush=True)
+                task.status = "running"
                 db.session.commit()
-    
-            except:
-                
-                print(f"[handler] task {current_id} failed to run", flush=True)
+                try:
+                    result = RunTask(task_id=current_id, type=current_type, args=current_args)
+                    print(f"[handler] task {current_id} is finished", flush=True)
 
-                task = db.session.query(Task).filter_by(id=current_id).with_for_update().first()
-                if task != None:
-                    task.result={"message:" "error when running"}
-                    task.status = "waiting"
+                    task = db.session.query(Task).filter_by(id=current_id).with_for_update().first()
+                    task.result = result
+                    task.status = "done"
                     db.session.commit()
+        
+                except:
+                    
+                    print(f"[handler] task {current_id} (type {current_type}) failed to run", flush=True)
+
+                    task = db.session.query(Task).filter_by(id=current_id).with_for_update().first()
+                    if task != None:
+                        task.result={"message:" "error when running"}
+                        task.status = "waiting"
+                        db.session.commit()
+            else:
+                print(f"[handler] task {current_id} has invalid type ({current_type}), the handler will not run it.")

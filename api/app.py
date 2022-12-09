@@ -1,6 +1,6 @@
 import sys
 from server import app, api
-from resources.web import *
+from resources.web import NewTask, ViewTask, Ping
 
 api.add_resource(NewTask, '/task/new')
 api.add_resource(ViewTask, '/task/<int:task_id>/view')

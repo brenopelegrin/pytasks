@@ -63,19 +63,23 @@ If you want your frontend app to connect with the API, then fill the ```FRONTEND
 
 Method: ```POST```
 
-This endpoint will register a new task in the server, passing some arguments in ```application/json``` format and returning the task info in ```application/json``` format:
+This endpoint will register a new task in the server. You need to pass some required arguments inside a ```application/json```. The json should contain a string with the task type, named ```type``` and the task-specific required arguments as a dictionary, named ```args```:
 
 Example of request:
 
 Parameters:
 ```json
 {
-    "required_arg":"test"
+    "type":"test",
+    "args": {
+      "x": 1,
+      "y": 2
+    }
 }
 ```
 
 ```bash
-curl -X POST localhost:5000/task/new -H 'Content-Type: application/json' -d '{"required_arg":"test"}'
+curl -X POST localhost:5000/task/new -H 'Content-Type: application/json' -d '{"type":"add", "args":{"x": 1, "y": 2}}'
 ```
 
 Example of response:
@@ -84,11 +88,35 @@ Example of response:
 {
 "id": 192,
 "result": null,
-"args": {"required_arg": "test"},
+"args": {"x": 1, "y": 2},
 "status": "waiting",
 "expire": 1668797956,
-"required_arg": "test",
+"type": "add",
 "created": 1668797946
+}
+```
+
+If the task type passed doesn't match the name of any function declared in the ```api/resources/tasks.py``` file, then it will return an error:
+
+```json
+{
+  "message":"task type [tasktype] doesnt exist"
+}
+```
+
+If the task exists but you didn't pass an required argument of the declared function, then it will return an error:
+
+```json
+{
+  "message": "the required param [param] was not passed."
+}
+```
+
+If the task exists, all arguments were passed but the type of an argument doesn't match the type of the argument on the declared function, then it will return an error:
+
+```json
+{
+  "message": "the passed param [param] doesnt match the required type: [required type]."
 }
 ```
 
@@ -110,12 +138,12 @@ Example of response:
 
 ```json
 {
-"id": 1,
-"result": {"message": "some_message"},
-"args": {"required_arg": "test"},
+"id": 192,
+"result": {"message": 3},
+"args": {"x": 1, "y": 2},
 "status": "done",
 "expire": 1668797956,
-"required_arg": "test",
+"type": "add",
 "created": 1668797946
 }
 ```
@@ -135,11 +163,81 @@ The status of a retrieved task can be:
 
 The handler is a module of the system that will scan through the database and get the tasks with ```waiting``` status.
 
-Then, it will run the ```ExecuteWhenRunningTask(task_id, args)``` function which should return a result for the task. After that, the result is stored in the ```result``` key of the task in the database. This function can be customized to fulfill your needs.
+If the found task has a type which matches the name of some function defined in the ```handler/resources/tasks.py``` file, then it will execute the function, passing the task arguments. After that, the result is stored in the ```result``` key of the task in the database.
+
+You can add as many tasks as you want in the code, by adding the decorator ```@tasks``` on top of a function in the ```resources\tasks.py``` file. Then, the function name will become a new task type and can be called from the API. For example, if you want to add a task that adds two numbers x and y, you should write the following:
+
+```python
+@task
+def add(x:int, y:int):
+  return x+y
+```
+
+It is required to ***explicitly declare the function arguments with annotations*** so that the API can process them correctly.
 
 The handler will mark the current task row as locked in the database, so that the other instances of handlers can't edit at the same time.
+
+
+>***⚠️ In order for all tasks processed by the API to be able to run on all handler instances, both the API and Handler ```resources/tasks.py``` file must be EXACTLY the same***. 
+
+> If you want some handler instances to run only specific tasks, see the ```Customizing handler instances for specific tasks``` section.
+
 
 ## The ```janitor```
 The janitor is a module of the system that will scan through the database and get the tasks that exceeded the maximum data permanency time (```MAX_TASK_TIME``` variable) in the database.
 
 Then, it will delete the task from the database. The janitor will mark the current task row as locked in the database, so that the other instances of handlers can't edit at the same time. 
+
+## Customizing handler instances for specific tasks
+A handler instance will only run the tasks that have been declared on the ```handler/resources/tasks.py```. 
+
+If you want some tasks to run in a specific handler instance, then you should copy the source ```handler``` directory to directories with different names for each handler instance type you want:
+
+```bash
+mkdir handler-type1
+mkdir handler-type2
+cp -r handler handler-type1
+cp -r handler handler-type2
+```
+
+Then, you can edit each ```handler-typeX/resources/tasks.py``` file and add specific tasks to each handler.
+
+After that, you can customize your ```docker-compose.yml``` file to scale your different handler instance types:
+
+```yaml
+version: "3"
+services:
+  api:
+    build: ./api
+    ports:
+      - "8000:8080"
+    network_mode: "host"
+    environment:
+      DATABASE_URL: "postgres://postgres:123@localhost:5432/flask_tasks" 
+  janitor:
+    build: ./janitor
+    network_mode: "host"
+    environment:
+      DATABASE_URL: "postgres://postgres:123@localhost:5432/flask_tasks"
+  handler-type1:
+    build: ./handler-type1
+    network_mode: "host"
+    environment:
+      DATABASE_URL: "postgres://postgres:123@localhost:5432/flask_tasks"
+  handler-type2:
+    build: ./handler-type1
+    network_mode: "host"
+    environment:
+      DATABASE_URL: "postgres://postgres:123@localhost:5432/flask_tasks"
+```
+
+To deploy, run the docker compose build command
+```bash
+docker compose build --no-cache --pull
+```
+
+Then, run the docker compose up command and specify how many ```handler-typeX``` and janitor instances you want
+
+```bash
+docker compose up --scale janitor=1 --scale handler-type1=1 --scale handler-type2=1
+```
