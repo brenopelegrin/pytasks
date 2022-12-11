@@ -13,7 +13,7 @@ def RunTask(task_id, type, args):
     task_func = tasklist[type]['func']
     result_of_execution = task_func(**args)
 
-    return {"message": result_of_execution}
+    return result_of_execution
 
 def TaskHandler():
     print("[handler] started taskhandler", flush=True)

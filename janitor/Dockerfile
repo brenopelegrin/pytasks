@@ -1,4 +1,4 @@
-FROM python:3.9.15-alpine3.15
+FROM python:3.10-slim-bullseye
 COPY . /app
 ENV DATABASE_URL postgres://postgres:123@localhost:5432/flask_tasks
 ENV MAX_TASK_TIME 30

@@ -16,9 +16,13 @@ def task(task_func):
     if task_func not in tasks.list:
         tasks.register_task(task_func)
     def wrapper(*args, **kwargs):
-        return task_func(*args, **kwars)
+        return task_func(*args, **kwargs)
     return wrapper
 
 @task
 def add(x: int, y: int):
-    return x+y
+    return None
+
+@task
+def mov3d(dt: float, r0: list, v0: list, mass: float, radius: float, drag: bool):
+    return None
