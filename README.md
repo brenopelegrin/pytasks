@@ -65,12 +65,12 @@ Method: ```POST```
 
 This endpoint will register a new task in the server. You need to pass some required arguments inside a ```application/json```. The json should contain a string with the task type, named ```type``` and the task-specific required arguments as a dictionary, named ```args```:
 
-Example of request:
+Example of request (task of type "add"):
 
 Parameters:
 ```json
 {
-    "type":"test",
+    "type":"add",
     "args": {
       "x": 1,
       "y": 2
@@ -117,6 +117,49 @@ If the task exists, all arguments were passed but the type of an argument doesn'
 ```json
 {
   "message": "the passed param [param] doesnt match the required type: [required type]."
+}
+```
+
+You can also use the example task "mov3d" for testing purposes, which will simulate the trajectory of a particle:
+
+Parameters:
+```json
+{
+    "type":"mov3d",
+    "args": {
+      "dt": 0.001,
+      "mass": 1.0,
+      "r0": [0.5, 0.5, 0.5],
+      "v0": [10.0, 10.0, 10.0],
+      "radius": 0.3,
+      "drag": false
+    }
+}
+```
+
+Example of response:
+
+```json
+{
+"id": 204,
+"result": {[all results of simulation]},
+"args": {[args you passed]},
+"status": "done",
+"expire": 1668797956,
+"type": "mov3d",
+"created": 1668797946
+}
+```
+Where the "result" will contain the following:
+```json
+"result": 
+{
+    "r": [[x1,y1,z1], [x2,y2,z2], [xn,yn,zn]],
+    "v": [[x1,y1,z1], [x2,y2,z2], [xn,yn,zn]],
+    "a": [[x1,y1,z1], [x2,y2,z2], [xn,yn,zn]],
+    "alpha": [[x1,y1,z1], [x2,y2,z2], [xn,yn,zn]],
+    "w": [[x1,y1,z1], [x2,y2,z2], [xn,yn,zn]],
+    "t": [t1, t2, tn]
 }
 ```
 
