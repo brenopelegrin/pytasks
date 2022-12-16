@@ -34,20 +34,20 @@ jobs:
         with:
           context: ./api
           push: true
-          tags: brenopelegrin/flask-tasks-api:latest
+          tags: brenopelegrin/flask-tasks-api:v1.0
       -
         name: 🚀 Build and push Handler
         uses: docker/build-push-action@v3
         with:
           context: ./handler
           push: true
-          tags: brenopelegrin/flask-tasks-handler:latest
+          tags: brenopelegrin/flask-tasks-handler:v1.0
       -
         name: 🚀 Build and push Janitor
         uses: docker/build-push-action@v3
         with:
           context: ./janitor
           push: true
-          tags: brenopelegrin/flask-tasks-janitor:latest
+          tags: brenopelegrin/flask-tasks-janitor:v1.0
           
 
