@@ -8,5 +8,5 @@ ENV GUNICORN_THREADS 1
 EXPOSE 8080
 RUN pip install --no-cache-dir -r /app/requirements.txt
 WORKDIR /app
-CMD [ "gunicorn", "--conf", "/app/gunicorn.conf.py", "app:app"]
+ENTRYPOINT gunicorn --conf /app/gunicorn.conf.py app:app
 

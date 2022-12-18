@@ -42,12 +42,5 @@ jobs:
           context: ./handler
           push: true
           tags: brenopelegrin/flask-tasks-handler:latest
-      -
-        name: 🚀 Build and push Janitor
-        uses: docker/build-push-action@v3
-        with:
-          context: ./janitor
-          push: true
-          tags: brenopelegrin/flask-tasks-janitor:latest
           
 

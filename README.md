@@ -1,18 +1,14 @@
 # flask-tasks-docker
 
-This is a generic ready-to-run Flask RESTful API written in Python that can receive task requests with some arguments, run some logic with the arguments provided and store the results on a SQL database. The results can then be retrieved from the API. The processing instances can be scaled according to your needs using docker.
-
-⏳ **Upcoming in v2.0**: the app will be redesigned to manage the tasks using **Celery + RabbitMQ + PostgreSQL**
+This is a generic ready-to-run Flask RESTful API written in Python that can receive task requests with some arguments, run some logic with the arguments provided (using Celery and AMQP queues) and store the results on a SQL database. The results can then be retrieved from the API. The processing instances can be scaled according to your needs using docker.
 
 ## Main features
 
-- You can scale multiple task handlers that can **proccess tasks in parallel**
-- **Highly customizable** to fulfill your needs
-- You can scale multiple janitors that can clean up the database in parallel
-- Can receive task from ```POST``` request **passing multiple parameters** in ```json```
-- Can store the received tasks in a SQL database and **do some computation** with them
-- Can return the result of the task from ```GET``` request passing the task ID as parameter
-
+- You can scale multiple workers that can **proccess tasks in parallel**
+- You can add as many **custom tasks** as you want: highly customizable
+- Can receive tasks from ```POST``` requests **passing multiple parameters** in ```json```
+- Can store the result of the tasks in a SQL database
+- Can return the result of a task from ```GET``` requests passing the task ID as parameter
 
 ## :rocket: Getting started
 
@@ -24,39 +20,47 @@ This is a generic ready-to-run Flask RESTful API written in Python that can rece
 
 First, make sure you have ```docker```and ```docker compose``` installed.
 
-Then, clone the repository and go to the cloned directory:
+:warning: Before running, please **make sure to configure the environment variables for API and Handler**.
+
+To run the API docker container, use the following command.
 ```bash
-git clone https://github.com/brenopelegrin/flask-tasks-docker.git && cd flask-tasks-docker
+docker run --network=host brenopelegrin/flask-tasks-api:latest
 ```
 
-:warning: Before building, please **make sure to configure the environment variables**.
+To run the worker container, use the following command. You will need to have ```uuidgen``` to generate a unique worker name.
 
-Then, run the docker compose build command
 ```bash
-docker compose build --no-cache --pull
+docker run --network=host --env WORKER_NAME=`uuidgen` brenopelegrin/flask-tasks-handler:latest
 ```
 
-Then, run the docker compose up command and specify how many handler and janitor instances you want
-```bash
-docker compose up --scale janitor=1 --scale handler=1
-```
+If you want to specify a custom worker name, change the ```WORKER_NAME``` variable. Make sure that all workers have unique names.
+
 
 ### Configuring environment variables
-Before running the docker compose, you need to configure the environment variables for each service (postgres, api, handler, janitor) in the ```docker-compose.yml``` file. 
 
-Below, you have an example of the environment variables for ```api```. Copy the same variables for the other services.
+- API:
+  
+  Please set the SQL Database URL, the AMQP backend URL, and the number of gunicorn workers and threads you want. 
 
-```yaml
-services:
-  api:
-    environment:
-      - DATABASE_URL: "postgres://[user]:[password]@[database_server_ip]:[port]/[database_name]"
-      - BACKEND_URL: "https://[backend_server_ip]:[port]"
-      - FRONTEND_URL: "https://[frontend_server_ip]:[port]"
-      - MAX_TASK_TIME: "[time_in_seconds]"
-```
-If you want your frontend app to connect with the API, then fill the ```FRONTEND_URL``` and ```BACKEND_URL``` for the JavaScript CORS to work.
+  If you want to, you can allow CORS only for your front-end site by setting the FRONTEND_URL with the front-end URL.
 
+  ```Dockerfile
+  ENV DATABASE_URL postgres://postgres:123@localhost:5432/flask_tasks_v2
+  ENV AMQP_URL redis://localhost:6379
+  ENV FRONTEND_URL *
+  ENV GUNICORN_WORKERS 3
+  ENV GUNICORN_THREADS 1
+  ```
+- Handler:
+  
+  Please set the SQL Database URL, the AMQP backend URL and the worker name you want. Make sure the worker name is unique.
+
+  ```Dockerfile
+  ENV DATABASE_URL postgres://postgres:123@localhost:5432/flask_tasks_v2
+  ENV AMQP_URL redis://localhost:6379
+  ENV WORKER_NAME worker
+  ```
+  
 ## API endpoints
 
 ### /task/new
@@ -86,17 +90,15 @@ Example of response:
 
 ```json
 {
-"id": 192,
-"result": null,
-"args": {"x": 1, "y": 2},
-"status": "waiting",
-"expire": 1668797956,
-"type": "add",
-"created": 1668797946
+  "id": "5861c3a8-fa0f-4b84-9e54-04b545408114",
+  "result": {},
+  "args": {"x": 1, "y": 2},
+  "status": "PENDING",
+  "type": "add",
 }
 ```
 
-If the task type passed doesn't match the name of any function declared in the ```api/resources/tasks.py``` file, then it will return an error:
+If the task type passed doesn't match the name of any function declared in the ```api/tasks.py``` file, then it will return an error:
 
 ```json
 {
@@ -117,6 +119,14 @@ If the task exists, all arguments were passed but the type of an argument doesn'
 ```json
 {
   "message": "the passed param [param] doesnt match the required type: [required type]."
+}
+```
+
+If you pass an argument that is not required, then it will return an error:
+
+```json
+{
+   "message": "the passed param [param] is not required."
 }
 ```
 
@@ -141,13 +151,11 @@ Example of response:
 
 ```json
 {
-"id": 204,
-"result": {[all results of simulation]},
-"args": {[args you passed]},
-"status": "done",
-"expire": 1668797956,
-"type": "mov3d",
-"created": 1668797946
+  "id": "5861c348-fa0f-4b84-9e54-04b545408114",
+  "result": {[all results of simulation]},
+  "args": {[args you passed]},
+  "status": "SUCCESS",
+  "type": "mov3d",
 }
 ```
 Where the "result" will contain the following:
@@ -174,44 +182,42 @@ Example of request:
 Parameters: ```<task_id>```
 
 ```bash
-curl -X GET localhost:5000/task/1/view
+curl -X GET localhost:5000/task/5861c3a8-fa0f-4b84-9e54-04b545408114/view
 ```
 
 Example of response:
 
 ```json
 {
-"id": 192,
-"result": {"message": 3},
-"args": {"x": 1, "y": 2},
-"status": "done",
-"expire": 1668797956,
-"type": "add",
-"created": 1668797946
+  "id": "5861c3a8-fa0f-4b84-9e54-04b545408114",
+  "result": 3,
+  "args": {"x": 1, "y": 2},
+  "status": "SUCCESS",
+  "type": "add",
 }
 ```
 
 The status of a retrieved task can be:
-- ```waiting```
+- ```PENDING```
   
-  Means that the task has been registered but has not yet been computed
-- ```running```
+  Means that the task doesn't exist *OR* exists and has not yet been received by a worker.
+
+- ```RUNNING```
   
-  Means that the task has been registered and is actually being computed
-- ```done```
+  Means that the task has been received by a worker and is actually being computed
+
+- ```SUCCESS```
   
-  Means that the task has been registered and have already been computed
+  Means that the task has been received by a worker, have already been computed and is available for view
 
 ## The ```handler```
 
-The handler is a module of the system that will scan through the database and get the tasks with ```waiting``` status.
+The handler is a module of the system based on Celery that will subscribe to the AMQP queue and wait for new tasks. When it receives a task, it will execute the task and store its value on the SQL database. 
 
-If the found task has a type which matches the name of some function defined in the ```handler/resources/tasks.py``` file, then it will execute the function, passing the task arguments. After that, the result is stored in the ```result``` key of the task in the database.
-
-You can add as many tasks as you want in the code, by adding the decorator ```@tasks``` on top of a function in the ```resources\tasks.py``` file. Then, the function name will become a new task type and can be called from the API. For example, if you want to add a task that adds two numbers x and y, you should write the following:
+You can add as many tasks as you want in the code, by adding the decorator ```@app.tasks``` on top of a function in the ```handler\tasks.py``` file. Then, the function name will become a new task type and can be called from the API. For example, if you want to add a task that adds two numbers x and y, you should write the following:
 
 ```python
-@task
+@app.tasks
 def add(x:int, y:int):
   return x+y
 ```
@@ -221,18 +227,12 @@ It is required to ***explicitly declare the function arguments with annotations*
 The handler will mark the current task row as locked in the database, so that the other instances of handlers can't edit at the same time.
 
 
->***⚠️ In order for all tasks processed by the API to be able to run on all handler instances, both the API and Handler ```resources/tasks.py``` file must be EXACTLY the same***. 
+>***⚠️ In order for all tasks processed by the API to be able to run on all handler instances, both the API and Handler ```tasks.py``` file must be EXACTLY the same***. 
 
 > If you want some handler instances to run only specific tasks, see the ```Customizing handler instances for specific tasks``` section.
 
-
-## The ```janitor```
-The janitor is a module of the system that will scan through the database and get the tasks that exceeded the maximum data permanency time (```MAX_TASK_TIME``` variable) in the database.
-
-Then, it will delete the task from the database. The janitor will mark the current task row as locked in the database, so that the other instances of handlers can't edit at the same time. 
-
 ## Customizing handler instances for specific tasks
-A handler instance will only run the tasks that have been declared on the ```handler/resources/tasks.py```. 
+A handler instance will only run the tasks that have been declared on the ```handler/tasks.py```. 
 
 If you want some tasks to run in a specific handler instance, then you should copy the source ```handler``` directory to directories with different names for each handler instance type you want:
 
@@ -243,7 +243,7 @@ cp -r handler handler-type1
 cp -r handler handler-type2
 ```
 
-Then, you can edit each ```handler-typeX/resources/tasks.py``` file and add specific tasks to each handler.
+Then, you can edit each ```handler-typeX/tasks.py``` file and add specific tasks to each handler.
 
 After that, you can customize your ```docker-compose.yml``` file to scale your different handler instance types:
 
@@ -257,20 +257,19 @@ services:
     network_mode: "host"
     environment:
       DATABASE_URL: "postgres://postgres:123@localhost:5432/flask_tasks" 
-  janitor:
-    build: ./janitor
-    network_mode: "host"
-    environment:
-      DATABASE_URL: "postgres://postgres:123@localhost:5432/flask_tasks"
   handler-type1:
     build: ./handler-type1
     network_mode: "host"
     environment:
+      WORKER_NAME: "worker2"
+      AMQP_URL: "redis://localhost:6379"
       DATABASE_URL: "postgres://postgres:123@localhost:5432/flask_tasks"
   handler-type2:
-    build: ./handler-type1
+    build: ./handler-type2
     network_mode: "host"
     environment:
+      WORKER_NAME: "worker2"
+      AMQP_URL: "redis://localhost:6379"
       DATABASE_URL: "postgres://postgres:123@localhost:5432/flask_tasks"
 ```
 
@@ -279,8 +278,8 @@ To deploy, run the docker compose build command
 docker compose build --no-cache --pull
 ```
 
-Then, run the docker compose up command and specify how many ```handler-typeX``` and janitor instances you want
+Then, run the docker compose up command:
 
 ```bash
-docker compose up --scale janitor=1 --scale handler-type1=1 --scale handler-type2=1
+docker compose up
 ```
