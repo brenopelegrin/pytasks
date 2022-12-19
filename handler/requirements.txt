@@ -2,3 +2,4 @@ celery==5.2.3
 SQLAlchemy==1.4.44
 Redis==4.4.0
 psycopg2-binary==2.9.5
+importlib-metadata==4.13.0
