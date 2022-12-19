@@ -12,17 +12,8 @@ app.conf.task_default_queue = 'tasks'
 
 @app.task
 def add(x: int, y: int):
-    time.sleep(2)
-    return x + y
+    return None
 
 @app.task
-def dump_context(x: int, y: int):
-    time.sleep(5)
-
-    return 'Example of string'
-
-@app.task
-def type1(arg1: int):
-    time.sleep(arg1)
-
-    return 1
+def mov3d(dt: float, r0: list, v0: list, mass: float, radius: float, drag: bool):
+    return None
