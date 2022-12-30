@@ -30,6 +30,13 @@ def F_drag(body_params:dict, fluid_params:dict, v:np.ndarray):
 
     return F
 
+def K_energy(m: float, v:np.ndarray):
+    return (0.5 * m * np.linalg.norm(v)**2)
+
+def P_energy(m:float, M:float, r:float):
+    #return (-G*M*m/np.linalg.norm(r))
+    return m*9.81*r[1]
+
 def simulate3D(sim_params:dict, body_params:dict, fluid_params:dict, r0:np.ndarray, v0:np.ndarray, dt: float):
     i=0
     t = [0]
@@ -42,17 +49,24 @@ def simulate3D(sim_params:dict, body_params:dict, fluid_params:dict, r0:np.ndarr
     M_terra = 5.972e24 #kg
 
     radius = body_params["radius"]
-
     r = [r0.tolist()]
     v = [v0.tolist()]
     w = [[0,0,0]]
     a = []
     alpha = []
+    ke = [np.around(K_energy(m=mass, v=v0), 6).tolist()]
 
-    while r[i][1]+radius >= 0:
+    radius_vec = np.array([0, radius, 0])
+
+    pe_EarthSurf = np.around(P_energy(m=mass, M=M_terra, r=R_terra), 6)
+    pe = [np.around(P_energy(m=mass, M=M_terra, r=r0+R_terra-radius_vec)-pe_EarthSurf, 6).tolist()]
+    
+    me = [ke[0]+pe[0]]
+
+    while r[i][1]-radius >= 0:
 
         drag_force = F_drag(body_params, fluid_params, np.array(v[i]))
-        gravity_force = F_gravity(m=mass, M=M_terra, r=np.array(r[0])+R_terra)
+        gravity_force = F_gravity(m=mass, M=M_terra, r=np.array(r[i])+R_terra)
 
         if run_drag:
             a_new = (1/mass) * (gravity_force + drag_force)
@@ -70,11 +84,14 @@ def simulate3D(sim_params:dict, body_params:dict, fluid_params:dict, r0:np.ndarr
         v.append(np.around(new["vn"],6).tolist())
         r.append(np.around(new["rn"],6).tolist())
         w.append(np.around(new["wn"],6).tolist())
+        ke.append(np.around(K_energy(m=mass, v=new["vn"]), 6).tolist())
+        pe.append(np.around(P_energy(m=mass, M=M_terra, r=new["rn"]+R_terra-radius_vec)-pe_EarthSurf, 6).tolist())
+        me.append(ke[i+1]+pe[i+1])
 
         t.append(round(t[i]+dt,6))
         i+=1
 
-    result={"t": t, "a": a, "v": v, "r": r, "w": w, "alpha": alpha}
+    result={"t": t, "a": a, "v": v, "r": r, "w": w, "alpha": alpha, "ke": ke, "pe": pe, "me": me}
 
     return result
 
