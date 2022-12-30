@@ -25,7 +25,11 @@ def F_drag(body_params:dict, fluid_params:dict, v:np.ndarray):
     rho_fluid = fluid_params["density"]
     mu_fluid = fluid_params["knematic_viscosity"]
 
-    v_hat = v/np.linalg.norm(v)
+    if(np.linalg.norm(v) == 0):
+        v_hat = np.array([0,0,0])
+    else:
+        v_hat = v/np.linalg.norm(v)
+
     F = (-1) * (mu_fluid*D*v + 0.5*rho_fluid*c_d*A_sec*(np.linalg.norm(v)**2)) * v_hat
 
     return F
@@ -33,9 +37,8 @@ def F_drag(body_params:dict, fluid_params:dict, v:np.ndarray):
 def K_energy(m: float, v:np.ndarray):
     return (0.5 * m * np.linalg.norm(v)**2)
 
-def P_energy(m:float, M:float, r:float):
-    #return (-G*M*m/np.linalg.norm(r))
-    return m*9.81*r[1]
+def P_energy(m:float, M:float, r:np.ndarray):
+    return (-G*M*m/np.linalg.norm(r))
 
 def simulate3D(sim_params:dict, body_params:dict, fluid_params:dict, r0:np.ndarray, v0:np.ndarray, dt: float):
     i=0
@@ -48,50 +51,70 @@ def simulate3D(sim_params:dict, body_params:dict, fluid_params:dict, r0:np.ndarr
     R_terra = np.array([0, r_terra, 0]) #m
     M_terra = 5.972e24 #kg
 
+    round_to = 6
+
     radius = body_params["radius"]
     r = [r0.tolist()]
     v = [v0.tolist()]
     w = [[0,0,0]]
     a = []
     alpha = []
-    ke = [np.around(K_energy(m=mass, v=v0), 6).tolist()]
+    ke = [np.around(K_energy(m=mass, v=v0), round_to).tolist()]
 
     radius_vec = np.array([0, radius, 0])
 
-    pe_EarthSurf = np.around(P_energy(m=mass, M=M_terra, r=R_terra), 6)
-    pe = [np.around(P_energy(m=mass, M=M_terra, r=r0+R_terra-radius_vec)-pe_EarthSurf, 6).tolist()]
+    pe_EarthSurf = np.around(P_energy(m=mass, M=M_terra, r=R_terra), round_to)
+    pe = [np.around(P_energy(m=mass, M=M_terra, r=r0+R_terra-radius_vec)-pe_EarthSurf, round_to).tolist()]
     
     me = [ke[0]+pe[0]]
 
     while r[i][1]-radius >= 0:
-
-        drag_force = F_drag(body_params, fluid_params, np.array(v[i]))
         gravity_force = F_gravity(m=mass, M=M_terra, r=np.array(r[i])+R_terra)
 
         if run_drag:
+            drag_force = F_drag(body_params, fluid_params, np.array(v[i]))
             a_new = (1/mass) * (gravity_force + drag_force)
         else:
             a_new = (1/mass) * gravity_force
 
-        a.append(np.around(a_new,6).tolist())
+        a.append(np.around(a_new, round_to).tolist())
 
-        alpha_new = (1/(radius**2)) * np.cross(np.array(r[i]), np.array(a[i]))
+        #alpha_new = (1/(radius**2)) * np.cross(np.array(r[i]), np.array(a[i]))
         alpha_new = np.array([0,0,0])
         alpha.append(alpha_new.tolist())
 
         new = euler(a=np.array(a[i]), alpha=np.array(alpha[i]), v=np.array(v[i]), w=np.array(w[i]), r=np.array(r[i]), h=dt)
 
-        v.append(np.around(new["vn"],6).tolist())
-        r.append(np.around(new["rn"],6).tolist())
-        w.append(np.around(new["wn"],6).tolist())
-        ke.append(np.around(K_energy(m=mass, v=new["vn"]), 6).tolist())
-        pe.append(np.around(P_energy(m=mass, M=M_terra, r=new["rn"]+R_terra-radius_vec)-pe_EarthSurf, 6).tolist())
+        v.append(np.around(new["vn"], round_to).tolist())
+        r.append(np.around(new["rn"], round_to).tolist())
+        w.append(np.around(new["wn"], round_to).tolist())
+        ke.append(np.around(K_energy(m=mass, v=new["vn"]), round_to).tolist())
+        pe.append(np.around(P_energy(m=mass, M=M_terra, r=new["rn"]+R_terra-radius_vec)-pe_EarthSurf, round_to).tolist())
         me.append(ke[i+1]+pe[i+1])
 
-        t.append(round(t[i]+dt,6))
+        t.append(round(t[i]+dt, round_to))
         i+=1
 
-    result={"t": t, "a": a, "v": v, "r": r, "w": w, "alpha": alpha, "ke": ke, "pe": pe, "me": me}
+    if ke[0] == 0:
+        nke = np.around((np.array(ke)/ke[1]), round_to).tolist()
+    else:
+        nke = np.around((np.array(ke)/ke[0]), round_to).tolist()
+
+    if pe[0] == 0:
+        npe = np.around((np.array(pe)/pe[1]), round_to).tolist()
+    else:
+        npe = np.around((np.array(pe)/pe[0]), round_to).tolist()
+
+    if me[0] == 0:
+        nme = np.around((np.array(me)/me[1]), round_to).tolist()
+    else:
+        nme = np.around((np.array(me)/me[0]), round_to).tolist()
+
+    result={   
+        "t": t, "a": a, "v": v, "r": r,
+        "w": w, "alpha": alpha, 
+        "ke": ke, "pe": pe, "me": me, "nke": nke, "npe": npe, "nme": nme
+    }
 
     return result
 
