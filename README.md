@@ -202,7 +202,7 @@ The status of a retrieved task can be:
   
   Means that the task doesn't exist *OR* exists and has not yet been received by a worker.
 
-- ```RUNNING```
+- ```STARTED```
   
   Means that the task has been received by a worker and is actually being computed
 
@@ -214,7 +214,7 @@ The status of a retrieved task can be:
 
 The handler is a module of the system based on Celery that will subscribe to the AMQP queue and wait for new tasks. When it receives a task, it will execute the task and store its value on the SQL database. 
 
-You can add as many tasks as you want in the code, by adding the decorator ```@app.tasks``` on top of a function in the ```handler\tasks.py``` file. Then, the function name will become a new task type and can be called from the API. For example, if you want to add a task that adds two numbers x and y, you should write the following:
+You can add as many tasks as you want in the code, by adding the decorator ```@app.task``` on top of a function in the ```handler\tasks.py``` file. Then, the function name will become a new task type and can be called from the API. For example, if you want to add a task that adds two numbers x and y, you should write the following:
 
 ```python
 @app.tasks
