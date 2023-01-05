@@ -1,10 +1,17 @@
 import sys
 from server import app, api
-from resources.web import NewTask, ViewTask, Ping
+from resources.web import NewTask, ViewTask, Ping, ProtectedByJwt, GenerateTokenForUser
 
+#   Unprotected routes
 api.add_resource(NewTask, '/task/new')
 api.add_resource(ViewTask, '/task/<string:task_id>/view')
 api.add_resource(Ping, '/ping')
+
+#   Protected routes
+api.add_resource(ProtectedByJwt, '/protected')
+
+#   Generate token route
+api.add_resource(GenerateTokenForUser, '/token')
 
 @app.route('/')
 def documentation():
