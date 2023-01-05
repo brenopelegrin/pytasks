@@ -69,7 +69,7 @@ def require_jwt(func):
                 except jwt.InvalidSignatureError:
                     abort_if_jwt_is_invalid_signature()
                 except Exception as err:
-                    print(f"Unexpected {err=}, {type(err)=}")
+                    print(f"Unexpected error {err}, with type {type(err)}")
                     abort_if_jwt_inexpected_error()
             else:
                 abort_if_jwt_is_invalid()
