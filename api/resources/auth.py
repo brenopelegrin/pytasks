@@ -50,7 +50,7 @@ def generate_new_jwt(payload: dict):
         max_timestamp = calendar.timegm(datetime.now(tz=timezone.utc).timetuple())+jwt_expire_time_sec
         payload['exp'] = str(max_timestamp)
 
-    return jwt.encode(payload, jwt_private_pem, algorithm=jwt_algorithm)
+    return jwt.encode(payload, jwt_private_pem, algorithm=jwt_algorithm), str(max_timestamp)
 
 def abort_if_authorization_header_not_present():
     abort(401, message=f'This endpoint requires the "Authentication: Bearer JWT_token" header.')
