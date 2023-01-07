@@ -131,9 +131,9 @@ class GenerateTokenForUser(Resource):
 
         payload = get_user_permissions(user=args["user"], password=args["password"])
 
-        token = generate_new_jwt(payload)
+        token, expire = generate_new_jwt(payload)
 
-        return {"token": token}
+        return {"token": token, "exp": expire}
 
 class ViewTaskList(Resource):
     def get(self):
