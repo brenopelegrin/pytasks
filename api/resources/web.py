@@ -6,28 +6,53 @@ import werkzeug
 from server import frontend_url
 import os
 from celery.result import AsyncResult
-from resources.auth import require_jwt, generate_new_jwt
+from resources.auth import require_jwt, generate_new_jwt, decrypt_jwt_authorization_header, verify_credentials, get_user_permissions, abort_if_authorization_header_not_present, abort_if_jwt_is_invalid
 
 #######################################################
 #       Collect task list, args and arg types
 #######################################################
 from tasks import app as capp
+from resources.auth import authorizedTasks
 import inspect
 celery_tasks = capp.tasks
 
 def collect_tasks(celery_task_list):
     tasklist = {}
     for name in celery_task_list.keys():
-        if 'task' in name:
-            tasklist[name.replace('tasks.', '')] = {
+        if 'tasks.' in name:
+            pure_name = name.replace('tasks.', '')
+            auth_data = {}
+            if pure_name in authorizedTasks.list:
+                auth_data = authorizedTasks.auth_data[pure_name]
+            tasklist[pure_name] = {
                 'task': celery_task_list[name], 
                 'func': celery_task_list[name].__wrapped__,
-                'args': inspect.getfullargspec(celery_task_list[name].__wrapped__).annotations
+                'args': inspect.getfullargspec(celery_task_list[name].__wrapped__).annotations,
+                'auth_data': auth_data
                 }
     return tasklist
 
 tasklist = collect_tasks(celery_tasks)
 #######################################################
+
+def abort_if_credentials_are_invalid(user, password):
+    is_valid = verify_credentials(user, password)
+    if not is_valid:
+        abort(401, message=f"Your credentials are invalid.")
+
+def abort_if_doesnt_have_permission(tasktype, auth_header):
+    if(tasktype in authorizedTasks.list):
+        if(auth_header):
+            decrypted_payload = decrypt_jwt_authorization_header(auth_header)
+            try:
+                task_permission = decrypted_payload['allowed_tasks'][tasktype]
+            except:
+                abort(401, message=f"The payload in your JWT is not valid.")
+
+            if not task_permission:
+                abort(401, message=f"You don't have permission to use this tasktype.")
+        else:
+            abort_if_authorization_header_not_present()
         
 def abort_if_tasktype_doesnt_exist(tasktype):
     if tasktype not in tasklist.keys():
@@ -56,11 +81,13 @@ def abort_if_task_params_are_invalid(tasktype, given_params):
 class NewTask(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('type', required=True, type=str, help='You need to inform required_arg', location='json')
+        parser.add_argument('type', required=True, type=str, help='You need to inform type', location='json')
         parser.add_argument('args', required=True, type=dict, help='You need to inform args dict', location='json')
+        parser.add_argument('Authorization', location='headers')
         args = parser.parse_args()
 
         abort_if_tasktype_doesnt_exist(tasktype=args["type"])
+        abort_if_doesnt_have_permission(tasktype=args["type"], auth_header=args["Authorization"])
         abort_if_task_params_are_invalid(tasktype=args["type"], given_params=args["args"])
 
         try:
@@ -91,16 +118,36 @@ class ProtectedByJwt(Resource):
         parser = reqparse.RequestParser()
         args = parser.parse_args()
 
-        return {"authorized": True, "payload": decoded_payload}
+        return decoded_payload
 
 class GenerateTokenForUser(Resource):
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('placeholder', required=True, type=str, help='You need to inform placeholder', location='json')
-        
+        parser.add_argument('user', required=True, type=str, help='You need to inform user', location='json')
+        parser.add_argument('password', required=True, type=str, help='You need to inform password', location='json')
         args = parser.parse_args()
-        payload = {"placeholder": args["placeholder"], "test": "testing"}
+
+        abort_if_credentials_are_invalid(user=args["user"], password=args["password"])
+
+        payload = get_user_permissions(user=args["user"], password=args["password"])
+
         token = generate_new_jwt(payload)
 
         return {"token": token}
+
+class ViewTaskList(Resource):
+    def get(self):
+        return_tasklist = {}
+        for task in tasklist:
+            return_args = {}
+            for arg in tasklist[task]["args"]:
+                return_args[arg] = str(tasklist[task]["args"][arg])
+            
+            need_auth = False
+            if task in authorizedTasks.list:
+                need_auth = True
+
+            return_tasklist[task] = {"require_authorization": need_auth, "args": return_args}
+
+        return return_tasklist
 

@@ -27,3 +27,7 @@ def mov3d(dt: float, r0: list, v0: list, mass: float, radius: float, drag: bool)
 
     result = sim.result
     return result
+
+@app.task
+def myProtectedTask(x: int, y: int)
+    return x+y

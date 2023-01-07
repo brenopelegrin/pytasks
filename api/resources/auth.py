@@ -9,6 +9,24 @@ import calendar
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 
+class AuthorizedTasks:
+    def __init__(self):
+        self.list = {}
+        self.auth_data = {}
+    def register_task(self, func):
+        self.list[func.__name__]={"func": func}
+        self.auth_data[func.__name__]={"func": func}
+
+authorizedTasks = AuthorizedTasks()
+
+def authorized_task(task_func):
+    if task_func not in authorizedTasks.list:
+        print(f"task {task_func.__name__} is authorized")
+        authorizedTasks.register_task(task_func)
+    def wrapper(*args, **kwargs):
+        return task_func(*args, **kwargs)
+    return wrapper
+
 secret_jwt = bytes(os.getenv('JWT_PRIVATE_PEM').encode('utf-8'))
 public_jwt = bytes(os.getenv('JWT_PUBLIC_PEM').encode('utf-8'))
 
@@ -46,8 +64,46 @@ def abort_if_jwt_is_invalid():
 def abort_if_jwt_is_invalid_signature():
     abort(401, message=f'This token has invalid signature.')
 
-def abort_if_jwt_inexpected_error():
+def abort_if_jwt_unexpected_error():
     abort(401, message=f'An unexpected error occured during JWT decryption.')
+
+def get_user_permissions(user:str, password:str):
+    # You can implement here an algorithm to get a dictionary from database based on credentials.
+    payload = {
+        "allowed_tasks": {
+            "myProtectedTask": True
+        }
+    }
+    return payload
+
+def verify_credentials(user:str, password:str):
+    # You can implement here an algorithm to verify the credentials, e.g. verifying a bcrypt hash on database
+    if user == "testuser" and password == "testpass":
+        return True
+    else:
+        return False
+
+def decrypt_jwt_authorization_header(auth_header):
+    token = auth_header
+    
+    if 'Bearer' in token:
+
+        token = token.split()[1]
+        try:
+            decoded = jwt.decode(token, jwt_public_pem, algorithms=[jwt_algorithm], verify_signature=True)
+            return decoded
+
+        except jwt.ExpiredSignatureError:
+            abort_if_jwt_is_expired()
+        except jwt.InvalidTokenError:
+            abort_if_jwt_is_invalid()
+        except jwt.InvalidSignatureError:
+            abort_if_jwt_is_invalid_signature()
+        except Exception as err:
+            print(f"Unexpected error {err}, with type {type(err)}")
+            abort_if_jwt_unexpected_error()
+    else:
+        abort_if_jwt_is_invalid()
 
 def require_jwt(func):
     @wraps(func)
