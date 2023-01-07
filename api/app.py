@@ -1,10 +1,11 @@
 import sys
 from server import app, api
-from resources.web import NewTask, ViewTask, Ping, ProtectedByJwt, GenerateTokenForUser
+from resources.web import NewTask, ViewTask, Ping, ProtectedByJwt, GenerateTokenForUser, ViewTaskList
 
-#   Unprotected routes
+#   Unprotected routes (except protected tasks)
 api.add_resource(NewTask, '/task/new')
 api.add_resource(ViewTask, '/task/<string:task_id>/view')
+api.add_resource(ViewTaskList, '/tasks')
 api.add_resource(Ping, '/ping')
 
 #   Protected routes
