@@ -29,5 +29,5 @@ def mov3d(dt: float, r0: list, v0: list, mass: float, radius: float, drag: bool)
     return result
 
 @app.task
-def myProtectedTask(x: int, y: int)
+def myProtectedTask(x: int, y: int):
     return x+y
