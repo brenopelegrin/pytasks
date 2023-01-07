@@ -6,6 +6,7 @@ import werkzeug
 from server import frontend_url
 import os
 from celery.result import AsyncResult
+from resources.auth import require_jwt, generate_new_jwt
 
 #######################################################
 #       Collect task list, args and arg types
@@ -83,3 +84,23 @@ class ViewTask(Resource):
 class Ping(Resource):
     def get(self):
         return {"status": "online"}
+
+class ProtectedByJwt(Resource):
+    method_decorators = {'post': [require_jwt]}
+    def post(self, decoded_payload):
+        parser = reqparse.RequestParser()
+        args = parser.parse_args()
+
+        return {"authorized": True, "payload": decoded_payload}
+
+class GenerateTokenForUser(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('placeholder', required=True, type=str, help='You need to inform placeholder', location='json')
+        
+        args = parser.parse_args()
+        payload = {"placeholder": args["placeholder"], "test": "testing"}
+        token = generate_new_jwt(payload)
+
+        return {"token": token}
+

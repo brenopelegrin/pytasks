@@ -44,13 +44,26 @@ If you want to specify a custom worker name, change the ```WORKER_NAME``` variab
 
   If you want to, you can allow CORS only for your front-end site by setting the FRONTEND_URL with the front-end URL.
 
+  You need to generate a 256 RSA keypair to use authentication based on JWT tokens.
+
   ```Dockerfile
   ENV DATABASE_URL postgres://postgres:123@localhost:5432/flask_tasks_v2
   ENV AMQP_URL redis://localhost:6379
   ENV FRONTEND_URL *
   ENV GUNICORN_WORKERS 3
   ENV GUNICORN_THREADS 1
+  ENV JWT_PUBLIC_PEM "<Your public RSA 256 key here>"
+  ENV JWT_PRIVATE_PEM "<Your public RSA 256 key here>"
   ```
+
+  To generate the 256 RSA keypar, you can run the following (make sure to have openssl installed):
+
+  ```
+  openssl genrsa -out private.pem 2048 && openssl rsa -in private.pem -pubout -out public.pem
+  ```
+
+  Then, set the environment variables with your keys.
+
 - Handler:
   
   Please set the SQL Database URL, the AMQP backend URL and the worker name you want. Make sure the worker name is unique.
