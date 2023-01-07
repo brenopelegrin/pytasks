@@ -46,10 +46,13 @@ if (use_jwt_expire):
     jwt_expire_time_sec = int(os.getenv('JWT_EXPIRE_SEC'))
 
 def generate_new_jwt(payload: dict):
-    if 'exp' not in payload and use_jwt_expire:
-        max_timestamp = str(calendar.timegm(datetime.now(tz=timezone.utc).timetuple())+jwt_expire_time_sec)
-        payload['exp'] = max_timestamp
-        return(jwt.encode(payload, jwt_private_pem, algorithm=jwt_algorithm), payload['exp'])
+    if use_jwt_expire:
+        if 'exp' not in payload:
+            max_timestamp = str(calendar.timegm(datetime.now(tz=timezone.utc).timetuple())+jwt_expire_time_sec)
+            payload['exp'] = max_timestamp
+            return(jwt.encode(payload, jwt_private_pem, algorithm=jwt_algorithm), payload['exp'])
+        else:
+            return(jwt.encode(payload, jwt_private_pem, algorithm=jwt_algorithm), str(payload['exp']))
     else:
         return(jwt.encode(payload, jwt_private_pem, algorithm=jwt_algorithm), 'infinity')
 
