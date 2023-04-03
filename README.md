@@ -10,6 +10,19 @@ This is a generic ready-to-run Flask RESTful API written in Python that can rece
 - Can store the result of the tasks in a SQL database
 - Can return the result of a task from ```GET``` requests passing the task ID as parameter
 
+## Current development
+The project is currently on release **2.0**.
+
+:heavy_check_mark: Features/changes made on release **2.0**:
+- Project redesigned to manage the tasks using Celery + RabbitMQ + PostgreSQL
+- Added authentication by JWT
+- Removed Janitor, now RabbitMQ + Celery manages the completed tasks.
+
+:hourglass_flowing_sand: Upcoming features/changes on release **3.0**:
+- Packaging system for tasks
+- Isolated environment for each task
+- C/C++ wrapper for tasks written in C/C++
+
 ## :rocket: Getting started
 
 - In what applications should I use it?
