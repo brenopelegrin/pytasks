@@ -11,7 +11,7 @@ from resources.auth import require_jwt, generate_new_jwt, decrypt_jwt_authorizat
 #######################################################
 #       Collect task list, args and arg types
 #######################################################
-from tasks import app as capp
+from celeryapp import celery_app as capp
 from resources.auth import authorizedTasks
 import inspect
 celery_tasks = capp.tasks
@@ -19,8 +19,8 @@ celery_tasks = capp.tasks
 def collect_tasks(celery_task_list):
     tasklist = {}
     for name in celery_task_list.keys():
-        if 'tasks.' in name:
-            pure_name = name.replace('tasks.', '')
+        if 'tasks.packs.' in name:
+            pure_name = name.replace('tasks.packs.', '')
             auth_data = {}
             if pure_name in authorizedTasks.list:
                 auth_data = authorizedTasks.auth_data[pure_name]

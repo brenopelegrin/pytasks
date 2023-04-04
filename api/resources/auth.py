@@ -5,6 +5,8 @@ import jwt
 import os
 from datetime import datetime, timezone
 import calendar
+import logging
+logger = logging.getLogger('gunicorn.error')
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
@@ -14,14 +16,16 @@ class AuthorizedTasks:
         self.list = {}
         self.auth_data = {}
     def register_task(self, func):
-        self.list[func.__name__]={"func": func}
-        self.auth_data[func.__name__]={"func": func}
+        pure_name = func.name.replace('tasks.packs.', '')
+        self.list[pure_name]={"func": func}
+        self.auth_data[pure_name]={"func": func}
 
 authorizedTasks = AuthorizedTasks()
 
 def authorized_task(task_func):
+    pure_name = task_func.name.replace('tasks.packs.', '')
     if task_func not in authorizedTasks.list:
-        print(f"task {task_func.__name__} is authorized")
+        logger.info(f"[auth] task '{pure_name}' registered as authorized")
         authorizedTasks.register_task(task_func)
     def wrapper(*args, **kwargs):
         return task_func(*args, **kwargs)
@@ -75,7 +79,7 @@ def get_user_permissions(user:str, password:str):
     # You can implement here an algorithm to get a dictionary from database based on credentials.
     payload = {
         "allowed_tasks": {
-            "myProtectedTask": True
+            "test.main.myProtectedTask": True
         }
     }
     return payload
