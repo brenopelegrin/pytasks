@@ -1,4 +1,4 @@
-def init(celery_app):
+def init(celery_app, **global_decorators):
     from glob import glob
     import os
     paths = glob('./tasks/packs/*')
@@ -18,4 +18,4 @@ def init(celery_app):
     
     for package in availablePackages:
         exec(f"import tasks.packs.{package} as {package}")
-        exec(f"{package}.init(celery_app)")
+        exec(f"{package}.init(celery_app, **global_decorators)")

@@ -1,4 +1,4 @@
-def init(celery_app):
+def init(celery_app, **global_decorators):
     @celery_app.task
     def mov3d(dt: float, r0: list, v0: list, mass: float, radius: float, drag: bool):
         from resources import mov3d as mov3d_module
