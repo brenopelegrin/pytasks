@@ -6,4 +6,4 @@ ENV WORKER_NAME worker
 RUN pip install --no-cache-dir -r /app/requirements.txt
 WORKDIR /app
 RUN cd /app
-ENTRYPOINT celery --app=tasks worker --loglevel=INFO --hostname=$WORKER_NAME@%h
+ENTRYPOINT celery --app=app worker --loglevel=INFO --hostname=$WORKER_NAME@%h
