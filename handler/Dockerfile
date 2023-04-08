@@ -4,6 +4,7 @@ ENV DATABASE_URL postgres://postgres:123@localhost:5432/flask_tasks_v2
 ENV AMQP_URL redis://localhost:6379
 ENV WORKER_NAME worker
 ENV ENVIRONMENT handler
+ENV DEFAULT_TASK_QUEUE tasks
 RUN pip install --no-cache-dir -r /app/requirements.txt
 RUN python /app/tasks/manager/manager.py -i physicsjs test --handler /app
 WORKDIR /app
