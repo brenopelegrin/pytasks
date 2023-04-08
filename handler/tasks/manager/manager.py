@@ -8,14 +8,7 @@ import json
 
 officialPackagesUrl = 'https://raw.githubusercontent.com/brenopelegrin/flask-tasks-docker/feature/tasks/add-task-packaging-system/taskpacks/official/packages.json'
 
-def remove(isInteractive, packages, context, console):
-    if(packages != []):
-        console.print("[bold white]Removing the following packages: ")
-        [console.print(f"\t[italic red](-) {x}") for x in packages]
-        console.print(":disappointed_relieved: Sorry, the 'remove' feature isn't implemented yet.")
-    return
-
-def install(isInteractive, packages, context, console):
+def install(packages, context, console):
     if(packages != []):
         console.print("[bold white]Installing the following packages: ")
         [console.print(f"\t[italic green](+) {x}") for x in packages]
@@ -60,7 +53,7 @@ def install(isInteractive, packages, context, console):
                 console.print(f"\n[bold red]:warning: (wheel/handler/install) couldn't install dependencies for extracted packages [bold green]{extractedPackages}: [bold white] install_packs.py not found on handler/tasks/packs.")
             console.print(f"\n[bold white](wheel/handler/install) finished.\n")
         else:
-            console.print(":warning: (wheel/handler/install) Argument --handler was not passed. No changes will be made on handler.")
+            console.print(":warning: (wheel/handler/install) Argument --handler was not passed. No changes will be made on handler directory.")
         if(context['api']['dir']):
             installDependencies = False
             extractedPackages = []
@@ -102,14 +95,7 @@ def install(isInteractive, packages, context, console):
                 console.print(f"\n[bold red]:warning: (wheel/api/install) couldn't install dependencies for extracted packages [bold green]{extractedPackages}: [bold white] install_packs.py not found on api/tasks/packs.")
             console.print(f"\n[bold white](wheel/api/install) finished.\n")
         else:
-            console.print(":warning: (wheel/api/install) Argument --api was not passed. No changes will be made on api.")
-    return
-
-def update(isInteractive, packages, context, console):
-    if(packages != []):
-        console.print("[bold white]Updating the following packages: ")
-        [console.print(f"\t[italic blue](*) {x}") for x in packages]
-        console.print(":disappointed_relieved: Sorry, the 'update' feature isn't implemented yet.")
+            console.print(":warning: (wheel/api/install) Argument --api was not passed. No changes will be made on api directory.")
     return
 
 if __name__ == '__main__':
@@ -118,12 +104,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog="manager",
         description="package manager for flask-tasks-docker")
-    parser.add_argument('-interactive', '--interactive', help="Interactive mode", action='store_true')
-    parser.add_argument('-i', '--install', dest='installs', nargs='+')
-    parser.add_argument('-r', '--remove', dest='removes', nargs='+')
-    parser.add_argument('-u', '--update', dest='updates', nargs='+')
-    parser.add_argument('-handler', '--handler', dest='handler_dir')
-    parser.add_argument('-api', '--api', dest='api_dir')
+    parser.add_argument('-i', '--install', dest='installs', nargs='+',
+        help="Install packages passed after argument. Example: -i package1 package2 package3")
+    parser.add_argument('-handler', '--handler', dest='handler_dir',
+        help="Specify the directory where the handler folder is located. If not specified, no changes will be made on handler.")
+    parser.add_argument('-api', '--api', dest='api_dir',
+        help="Specify the directory where the api folder is located. If not specified, no changes will be made on api.")
+    parser.add_argument('-pl', '--packagelist', dest='custom_package_list', action='store',
+        help="Use a custom package list manifest to fetch the available packages for installation. Example: -pl https://raw.myrepo.com/packages.json")
     args = parser.parse_args()
 
     currentContext = {
@@ -135,51 +123,24 @@ if __name__ == '__main__':
             "dir": args.api_dir,
         }
     }
-    
-    currentContext["officialPackagesManifest"] = json.loads(urlopen(officialPackagesUrl).read())
 
-    isInteractive = args.interactive
+    if(args.custom_package_list):
+        try:
+            currentContext["officialPackagesManifest"] = json.loads(urlopen(args.custom_package_list).read())
+        except:
+            console.print(f"[bold red]:warning: Can't reach custom package list manifest at [bold white]'{args.custom_package_list}'.[bold red] Exiting.")
+            exit()
+    else:
+        try:
+            currentContext["officialPackagesManifest"] = json.loads(urlopen(officialPackagesUrl).read())
+        except:
+            console.print(f"[bold red]:warning: Can't reach official package list manifest at [bold white]'{officialPackagesUrl}'.[bold red] Exiting.")
+            exit()
 
-    if(not isInteractive):
-        console.print("> Welcome to [bold blue]taskpacks-manager! [white italic]@flask-tasks-docker/release/3")
-        if(args.installs):
-            install(isInteractive, packages=args.installs, context=currentContext, console=console)
-        if(args.removes):
-            remove(isInteractive, packages=args.removes, context=currentContext, console=console)
-        if(args.updates):
-            update(isInteractive, packages=args.updates, context=currentContext, console=console)
-        exit()
 
     console.print("> Welcome to [bold blue]taskpacks-manager! [white italic]@flask-tasks-docker/release/3")
-    console.print("|- Please select one of the following options:")
-    console.print("\t[bold magenta] r) Remove packages")
-    console.print("\t[bold magenta] i) Install packages")
-    console.print("\t[bold magenta] u) Update packages")
-    console.print("\t[bold red] q) Quit")
-    console.print("[bold italic white]> Choice:", end=" ")
-    while (operation:=input()) not in ['r', 'i', 'u', 'q']:
-        console.print("[bold red]:warning: Invalid operation. \n") 
-        console.print("|- Please select one of the following options:")
-        console.print("\t[bold magenta] r) Remove packages")
-        console.print("\t[bold magenta] i) Install packages")
-        console.print("\t[bold magenta] u) Update packages")
-        console.print("\t[bold red] q) Quit")
-        console.print("[bold italic white]> Choice:", end=" ")
-
-    if(operation == 'r'):
-        console.print(":disappointed_relieved: Sorry, the interactive mode isn't implemented yet.")
-        exit()
-        #remove(isInteractive, packages=[], context=currentContext, console=console)
-    elif(operation == 'i'):
-        console.print(":disappointed_relieved: Sorry, the interactive mode isn't implemented yet.")
-        exit()
-        #install(isInteractive, packages=[], context=currentContext, console=console)
-    elif(operation == 'u'):
-        console.print(":disappointed_relieved: Sorry, the interactive mode isn't implemented yet.")
-        exit()
-        #update(isInteractive, packages=[], context=currentContext, console=console)
-    elif(operation == 'q'):
-        exit()
+    if(args.installs):
+        install(packages=args.installs, context=currentContext, console=console)
     else:
-        console.print(':warning: An error has occurred.')
+        console.print("[italic white]No packages passed on -i or --install. No changes will be made. Exiting.")
         exit()

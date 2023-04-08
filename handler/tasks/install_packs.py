@@ -7,7 +7,7 @@ if __name__ == '__main__':
     for pack in packs:
         if('__pycache__' not in pack and os.path.isdir(pack)):
             os.chdir(pack)
-            print(f"[package] found package '{pack.replace('./', '')}' -> installing requirements.txt")
+            print(f"[wheel/dependencies] found package '{pack.replace('./', '')}' -> installing {os.path.basename(pack)}/requirements.txt")
             os.system('pip install --no-cache-dir -r requirements.txt')
             os.system('touch installed.lock')
             os.chdir(packsDir)
