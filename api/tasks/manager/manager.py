@@ -12,6 +12,7 @@ def remove(isInteractive, packages, context, console):
     if(packages != []):
         console.print("[bold white]Removing the following packages: ")
         [console.print(f"\t[italic red](-) {x}") for x in packages]
+        console.print(":disappointed_relieved: Sorry, the 'remove' feature isn't implemented yet.")
     return
 
 def install(isInteractive, packages, context, console):
@@ -108,6 +109,7 @@ def update(isInteractive, packages, context, console):
     if(packages != []):
         console.print("[bold white]Updating the following packages: ")
         [console.print(f"\t[italic blue](*) {x}") for x in packages]
+        console.print(":disappointed_relieved: Sorry, the 'update' feature isn't implemented yet.")
     return
 
 if __name__ == '__main__':
@@ -165,11 +167,17 @@ if __name__ == '__main__':
         console.print("[bold italic white]> Choice:", end=" ")
 
     if(operation == 'r'):
-        remove(isInteractive, packages=[], context=currentContext, console=console)
+        console.print(":disappointed_relieved: Sorry, the interactive mode isn't implemented yet.")
+        exit()
+        #remove(isInteractive, packages=[], context=currentContext, console=console)
     elif(operation == 'i'):
-        install(isInteractive, packages=[], context=currentContext, console=console)
+        console.print(":disappointed_relieved: Sorry, the interactive mode isn't implemented yet.")
+        exit()
+        #install(isInteractive, packages=[], context=currentContext, console=console)
     elif(operation == 'u'):
-        update(isInteractive, packages=[], context=currentContext, console=console)
+        console.print(":disappointed_relieved: Sorry, the interactive mode isn't implemented yet.")
+        exit()
+        #update(isInteractive, packages=[], context=currentContext, console=console)
     elif(operation == 'q'):
         exit()
     else:

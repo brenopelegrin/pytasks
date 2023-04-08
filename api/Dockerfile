@@ -7,6 +7,7 @@ ENV GUNICORN_WORKERS 3
 ENV GUNICORN_THREADS 1
 EXPOSE 8080
 RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN python /app/tasks/manager/manager.py -i physicsjs test --api /app
 WORKDIR /app
 ENTRYPOINT gunicorn --conf /app/gunicorn.conf.py app:app
 

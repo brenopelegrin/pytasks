@@ -5,7 +5,7 @@ ENV AMQP_URL redis://localhost:6379
 ENV WORKER_NAME worker
 ENV ENVIRONMENT handler
 RUN pip install --no-cache-dir -r /app/requirements.txt
-RUN python tasks/install_packs.py
+RUN python /app/tasks/manager/manager.py -i physicsjs test --handler /app
 WORKDIR /app
 RUN cd /app
 ENTRYPOINT celery --app=celeryapp worker --loglevel=INFO --hostname=$WORKER_NAME@%h

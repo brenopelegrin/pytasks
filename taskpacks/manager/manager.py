@@ -12,6 +12,7 @@ def remove(isInteractive, packages, context, console):
     if(packages != []):
         console.print("[bold white]Removing the following packages: ")
         [console.print(f"\t[italic red](-) {x}") for x in packages]
+        console.print(":disappointed_relieved: Sorry, the 'remove' feature isn't implemented yet.")
     return
 
 def install(isInteractive, packages, context, console):
@@ -108,6 +109,7 @@ def update(isInteractive, packages, context, console):
     if(packages != []):
         console.print("[bold white]Updating the following packages: ")
         [console.print(f"\t[italic blue](*) {x}") for x in packages]
+        console.print(":disappointed_relieved: Sorry, the 'update' feature isn't implemented yet.")
     return
 
 if __name__ == '__main__':
@@ -116,12 +118,20 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog="manager",
         description="package manager for flask-tasks-docker")
-    parser.add_argument('-interactive', '--interactive', help="Interactive mode", action='store_true')
-    parser.add_argument('-i', '--install', dest='installs', nargs='+')
-    parser.add_argument('-r', '--remove', dest='removes', nargs='+')
-    parser.add_argument('-u', '--update', dest='updates', nargs='+')
-    parser.add_argument('-handler', '--handler', dest='handler_dir')
-    parser.add_argument('-api', '--api', dest='api_dir')
+    parser.add_argument('-interactive', '--interactive', action='store_true',
+        help="Activates interactive mode when argument is passed",)
+    parser.add_argument('-i', '--install', dest='installs', nargs='+',
+        help="Install packages passed after argument. Example: -i package1 package2 package3")
+    parser.add_argument('-r', '--remove', dest='removes', nargs='+',
+        help="Removes packages passed after argument. Example: -r package1 package2 package3")
+    parser.add_argument('-u', '--update', dest='updates', nargs='+',
+        help="Updates packages passed after argument. Example: -u package1 package2 package3")
+    parser.add_argument('-handler', '--handler', dest='handler_dir',
+        help="Specify the directory where the handler folder is located. If not specified, no changes will be made on handler.")
+    parser.add_argument('-api', '--api', dest='api_dir',
+        help="Specify the directory where the api folder is located. If not specified, no changes will be made on api.")
+    parser.add_argument('-pl', '--packagelist', dest='custom_package_list', action='store',
+        help="Use a custom package list manifest to fetch the available packages for installation. Example: -pl https://raw.myrepo.com/packages.json")
     args = parser.parse_args()
 
     currentContext = {
@@ -133,8 +143,20 @@ if __name__ == '__main__':
             "dir": args.api_dir,
         }
     }
-    
-    currentContext["officialPackagesManifest"] = json.loads(urlopen(officialPackagesUrl).read())
+
+    if(args.custom_package_list):
+        try:
+            currentContext["officialPackagesManifest"] = json.loads(urlopen(args.custom_package_list).read())
+        except:
+            console.print(f"[bold red]:warning: Can't reach custom package list manifest at [bold white]'{args.custom_package_list}'.[bold red] Exiting.")
+            exit()
+    else:
+        try:
+            currentContext["officialPackagesManifest"] = json.loads(urlopen(officialPackagesUrl).read())
+        except:
+            console.print(f"[bold red]:warning: Can't reach official package list manifest at [bold white]'{officialPackagesUrl}'.[bold red] Exiting.")
+            exit()
+
 
     isInteractive = args.interactive
 
@@ -165,11 +187,17 @@ if __name__ == '__main__':
         console.print("[bold italic white]> Choice:", end=" ")
 
     if(operation == 'r'):
-        remove(isInteractive, packages=[], context=currentContext, console=console)
+        console.print(":disappointed_relieved: Sorry, the interactive mode isn't implemented yet.")
+        exit()
+        #remove(isInteractive, packages=[], context=currentContext, console=console)
     elif(operation == 'i'):
-        install(isInteractive, packages=[], context=currentContext, console=console)
+        console.print(":disappointed_relieved: Sorry, the interactive mode isn't implemented yet.")
+        exit()
+        #install(isInteractive, packages=[], context=currentContext, console=console)
     elif(operation == 'u'):
-        update(isInteractive, packages=[], context=currentContext, console=console)
+        console.print(":disappointed_relieved: Sorry, the interactive mode isn't implemented yet.")
+        exit()
+        #update(isInteractive, packages=[], context=currentContext, console=console)
     elif(operation == 'q'):
         exit()
     else:
