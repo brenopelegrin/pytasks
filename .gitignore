@@ -1,7 +1,9 @@
 # Project-specific files
 tester/
-keys/
 handler/tester.py
+
+# flask-tasks-docker package lock files
+installed.lock
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

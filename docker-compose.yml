@@ -1,0 +1,39 @@
+services:
+  api:
+    image: brenopelegrin/pytasks-api:latest
+    env_file:
+      - ./api.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - pytasks-network
+    environment:
+      - JWT_PRIVATE_PEM
+      - JWT_PUBLIC_PEM
+  handler:
+    image: brenopelegrin/pytasks-handler:latest
+    env_file:
+      - ./handler.env
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - pytasks-network
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    networks:
+      - pytasks-network
+  postgres:
+    image: postgres
+    volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
+    environment:
+      - POSTGRES_PASSWORD="password"
+    networks:
+      - pytasks-network
+networks:
+  pytasks-network:
+    driver: bridge

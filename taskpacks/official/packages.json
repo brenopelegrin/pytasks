@@ -1,0 +1,14 @@
+{
+    "physicsjs": {
+        "name": "physicsjs",
+        "author": "brenopelegrin",
+        "version": "1.0",
+        "link": "https://github.com/brenopelegrin/pytasks-physicsjs/archive/refs/heads/master.zip"
+    },
+    "test": {
+        "name": "test",
+        "author": "brenopelegrin",
+        "version": "1.0",
+        "link": "https://github.com/brenopelegrin/pytasks-test/archive/refs/heads/master.zip"
+    }
+}

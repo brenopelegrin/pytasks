@@ -11,3 +11,4 @@ psycopg2-binary==2.9.5
 importlib-metadata==4.13.0
 pyjwt==2.6.0
 cryptography==39.0.0
+rich==13.3.3

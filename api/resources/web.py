@@ -11,7 +11,7 @@ from resources.auth import require_jwt, generate_new_jwt, decrypt_jwt_authorizat
 #######################################################
 #       Collect task list, args and arg types
 #######################################################
-from tasks import app as capp
+from celeryapp import celery_app as capp
 from resources.auth import authorizedTasks
 import inspect
 celery_tasks = capp.tasks
@@ -19,8 +19,8 @@ celery_tasks = capp.tasks
 def collect_tasks(celery_task_list):
     tasklist = {}
     for name in celery_task_list.keys():
-        if 'tasks.' in name:
-            pure_name = name.replace('tasks.', '')
+        if 'tasks.packs.' in name:
+            pure_name = name.replace('tasks.packs.', '')
             auth_data = {}
             if pure_name in authorizedTasks.list:
                 auth_data = authorizedTasks.auth_data[pure_name]
@@ -79,7 +79,15 @@ def abort_if_task_params_are_invalid(tasktype, given_params):
             abort(404, message=message)
 
 class NewTask(Resource):
+    """
+    Registers a new task request through POST method.
+    """
     def post(self):
+        """Posts a task 
+
+        Returns:
+            taskInfo (dict): dictionary with the task id, arguments passed and current status of the task. 
+        """
         parser = reqparse.RequestParser()
         parser.add_argument('type', required=True, type=str, help='You need to inform type', location='json')
         parser.add_argument('args', required=True, type=dict, help='You need to inform args dict', location='json')
