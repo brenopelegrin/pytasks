@@ -12,10 +12,19 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 
 class AuthorizedTasks:
+    """
+    Stores the function object of functions decorated by the @authorized_task decorator at self.list.
+    """
     def __init__(self):
         self.list = {}
         self.auth_data = {}
     def register_task(self, func):
+        """
+        Registers a function in the AuthorizedTasks.list dict.
+
+        Args:
+            func (function): the function to be registered.
+        """
         pure_name = func.name.replace('tasks.packs.', '')
         self.list[pure_name]={"func": func}
         self.auth_data[pure_name]={"func": func}
@@ -23,6 +32,16 @@ class AuthorizedTasks:
 authorizedTasks = AuthorizedTasks()
 
 def authorized_task(task_func):
+    """
+    Decorator for functions which require authentication by JWT.
+    When the @authorized_task is placed, it will register the decorated function in the AuthorizedTasks function list.
+    
+    Args:
+        task_func (function): the decorated function
+
+    Returns:
+        wrapper: a function that returns the original task_func function.
+    """
     pure_name = task_func.name.replace('tasks.packs.', '')
     if task_func not in authorizedTasks.list:
         logger.info(f"[auth] task '{pure_name}' registered as authorized")
@@ -50,6 +69,14 @@ if (use_jwt_expire):
     jwt_expire_time_sec = int(os.getenv('JWT_EXPIRE_SEC'))
 
 def generate_new_jwt(payload: dict):
+    """
+    Generates a new JWT token containing a payload.
+
+    Args:
+        payload (dict): A dictionary with the data that will be placed inside the JWT token.
+    Returns:
+        jwt_token (str): the generated JWT token
+    """
     if use_jwt_expire:
         if 'exp' not in payload:
             max_timestamp = str(calendar.timegm(datetime.now(tz=timezone.utc).timetuple())+jwt_expire_time_sec)
@@ -76,6 +103,20 @@ def abort_if_jwt_unexpected_error():
     abort(401, message=f'An unexpected error occured during JWT decryption.')
 
 def get_user_permissions(user:str, password:str):
+    """
+    Gets user allowed task names by credentials passed.
+    It's possible to customize this function for the needs of your project.
+    We discourage to use hardcoded values for credentials or permissions here.
+    It is strongly recommended to hash your credentials with bcrypt and store them in a database.
+    By default, all users have test.main.myProtectedTask as an allowed task.
+
+    Args:
+        user (str): user identifier credential
+        password (str): password credential
+
+    Returns:
+        payload (dict): dictionary with user's allowed tasks.
+    """
     # You can implement here an algorithm to get a dictionary from database based on credentials.
     payload = {
         "allowed_tasks": {
@@ -85,6 +126,21 @@ def get_user_permissions(user:str, password:str):
     return payload
 
 def verify_credentials(user:str, password:str):
+    """
+    A function that verifies if the credentials are correct.
+    It's possible to customize this function for the needs of your project.
+    We discourage to use hardcoded values for credentials here.
+    It is strongly recommended to hash your credentials with bcrypt and store them in a database.
+    By default, the correct credentials are user="testuser" and password="testpass"
+
+    Args:
+        user (str): user identifier credential
+        password (str): password credential
+
+    Returns:
+        isVerified (boolean): true if credentials are correct, otherwise, false.
+    """
+
     # You can implement here an algorithm to verify the credentials, e.g. verifying a bcrypt hash on database
     if user == "testuser" and password == "testpass":
         return True

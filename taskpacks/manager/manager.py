@@ -9,6 +9,13 @@ import json
 officialPackagesUrl = 'https://raw.githubusercontent.com/brenopelegrin/flask-tasks-docker/feature/tasks/add-task-packaging-system/taskpacks/official/packages.json'
 
 def install(packages, context, console):
+    """_summary_
+
+    Args:
+        packages (_type_): _description_
+        context (_type_): _description_
+        console (_type_): _description_
+    """
     if(packages != []):
         console.print("[bold white]Installing the following packages: ")
         [console.print(f"\t[italic green](+) {x}") for x in packages]

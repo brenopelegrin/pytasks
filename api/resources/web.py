@@ -79,7 +79,15 @@ def abort_if_task_params_are_invalid(tasktype, given_params):
             abort(404, message=message)
 
 class NewTask(Resource):
+    """
+    Registers a new task request through POST method.
+    """
     def post(self):
+        """Posts a task 
+
+        Returns:
+            taskInfo (dict): dictionary with the task id, arguments passed and current status of the task. 
+        """
         parser = reqparse.RequestParser()
         parser.add_argument('type', required=True, type=str, help='You need to inform type', location='json')
         parser.add_argument('args', required=True, type=dict, help='You need to inform args dict', location='json')
