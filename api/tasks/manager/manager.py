@@ -6,7 +6,7 @@ import argparse
 import os
 import json
 
-officialPackagesUrl = 'https://raw.githubusercontent.com/brenopelegrin/flask-tasks-docker/feature/tasks/add-task-packaging-system/taskpacks/official/packages.json'
+officialPackagesUrl = 'https://raw.githubusercontent.com/brenopelegrin/pytasks/master/taskpacks/official/packages.json'
 
 def install(packages, context, console):
     if(packages != []):
