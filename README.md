@@ -102,10 +102,10 @@ Example of response:
 
 ```json
 {
-	"allowed_tasks": {
-		"myProtectedTask": true
-	},
-	"exp": "1680738370"
+  "allowed_tasks": {
+    "myProtectedTask": true
+  },
+  "exp": "1680738370"
 }
 ```
 
@@ -124,31 +124,31 @@ Example of response:
 
 ```json
 {
-	"myProtectedTask": {
-		"require_authorization": true,
-		"args": {
-			"x": "<class 'int'>",
-			"y": "<class 'int'>"
-		}
-	},
-	"mov3d": {
-		"require_authorization": false,
-		"args": {
-			"dt": "<class 'float'>",
-			"r0": "<class 'list'>",
-			"v0": "<class 'list'>",
-			"mass": "<class 'float'>",
-			"radius": "<class 'float'>",
-			"drag": "<class 'bool'>"
-		}
-	},
-	"tadd": {
-		"require_authorization": false,
-		"args": {
-			"x": "<class 'int'>",
-			"y": "<class 'int'>"
-		}
-	}
+  "myProtectedTask": {
+    "require_authorization": true,
+    "args": {
+      "x": "<class 'int'>",
+      "y": "<class 'int'>"
+    }
+  },
+  "mov3d": {
+    "require_authorization": false,
+    "args": {
+      "dt": "<class 'float'>",
+      "r0": "<class 'list'>",
+      "v0": "<class 'list'>",
+      "mass": "<class 'float'>",
+      "radius": "<class 'float'>",
+      "drag": "<class 'bool'>"
+    }
+  },
+  "tadd": {
+    "require_authorization": false,
+    "args": {
+      "x": "<class 'int'>",
+      "y": "<class 'int'>"
+    }
+  }
 }
 ```
 
@@ -221,7 +221,7 @@ If you pass an argument that is not required, then it will return an error:
 
 To post a task which type needs authorization, pass the Authorization header as following:
 ```bash
-curl -X GET localhost:5000/protected -H "Authorization: Bearer <YOUR_JWT_TOKEN>" -H 'Content-Type: application/json' -d '{"type":"myProtectedTask", "args":{"x": 1, "y": 2}}'
+curl -X POST localhost:5000/task -H "Authorization: Bearer <YOUR_JWT_TOKEN>" -H 'Content-Type: application/json' -d '{"type":"myProtectedTask", "args":{"x": 1, "y": 2}}'
 ```
 
 You can also use the example task "mov3d" for testing purposes, which will simulate the trajectory of a particle:
