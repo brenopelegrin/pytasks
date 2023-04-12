@@ -1,6 +1,5 @@
-# Introduction
 
-``pytasks`` is a microservice for running computational tasks on remote machines and viewing its results through an API. 
+``pytasks`` is a complete and customizable microservice for running computational tasks on remote machines and viewing its results through an API. 
 
 :warning: **Notice**: the documentation for this project is still being written. You may encounter uncomplete pages or sections.
 
@@ -25,9 +24,11 @@ export JWT_PUBLIC_PEM=$(cat ./examples/keys/jwtRS256.key.pub) &&
 docker compose up -d
 ```
 
-> :warning: This command uses the example RSA keypair stored in the repository and default passwords for PostgreSQL and RabbitMQ. You **MUST** setup your own RSA keypair and credentials in production to avoid security issues. See the [setting up environment variables](setup_env.md) section for more informations.
+> :warning: This command uses the example RSA keypair stored in the repository and default passwords for PostgreSQL and RabbitMQ. You **MUST** setup your own RSA keypair and credentials in production to avoid security issues. See the [Setting up](setup.md) section for more informations.
 
 After the containers start, the API will be available at ``http://localhost:8080``.
+
+:light_bulb: For more instructions on how to customize your ``pytasks`` containers and how to run them, see [Setting up](setup.md).
 
 ## Understanding the project with more depth
 
@@ -61,6 +62,17 @@ def mySimpleTask(number1: int, number2: int):
 
 ### **A little more about the [api](api.md)**
 The API 
+
+Quick list of endpoints
+
+| Endpoint                | Method   | Description                                        |
+| ----------------------- | -------- | -------------------------------------------------- |
+| ``/task/<taskId:uuid>`` | ``GET``  | Fetch task information                             |
+| ``/task``               | ``POST`` | Post a task to server                              |
+| ``/protected``          | ``GET``  | Fetch available protected tasks for your JWT token |
+| ``/token``              | ``GET``  | Generate JWT token from credentials                |
+
+:light_bulb: For more detailed information on API endpoints and how to make requests, please see the [API specification](api.specification.md) section.
 
 ### **A little more about the [handler](handler.md)**
 The Handler
