@@ -113,8 +113,8 @@ class Ping(Resource):
         return {"status": "online"}
 
 class ProtectedByJwt(Resource):
-    method_decorators = {'post': [require_jwt]}
-    def post(self, decoded_payload):
+    method_decorators = {'get': [require_jwt]}
+    def get(self, decoded_payload):
         parser = reqparse.RequestParser()
         args = parser.parse_args()
 
