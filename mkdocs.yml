@@ -6,13 +6,18 @@ theme:
     - content.code.copy
 nav:
   - Introduction: index.md
+  - Setiing up: setup.md
   - API:
     - Introduction: api.md
+    - Specification: api.specification.md
   - Handler:
     - Introduction: handler.md
   - Reference:
-    - api.reference.md
-    - taskpacks.manager.manager.reference.md
+    - release/3:
+      - api.reference.md
+      - taskpacks.manager.manager.reference.md
+    - release/2:
+      - Documentation: release2-doc.md
 plugins:
   - include-markdown
   - search
