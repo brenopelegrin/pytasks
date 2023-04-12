@@ -89,7 +89,70 @@ If you want to specify a custom worker name, change the ```WORKER_NAME``` variab
   
 ## API endpoints
 
-### /task/new
+### /protected
+
+Method: ```GET```
+
+This endpoint will return a list of all protected tasks available for your JWT token.
+```bash
+curl -X GET localhost:5000/protected -H "Authorization: Bearer <YOUR_JWT_TOKEN>"
+```
+
+Example of response:
+
+```json
+{
+	"allowed_tasks": {
+		"myProtectedTask": true
+	},
+	"exp": "1680738370"
+}
+```
+
+Where ``exp`` is the timestamp in which your JWT token will expire.
+
+### /tasks
+
+Method: ```GET```
+
+This endpoint will return a list of all available tasks and its required arguments.
+
+```bash
+curl -X GET localhost:5000/tasks
+```
+Example of response:
+
+```json
+{
+	"myProtectedTask": {
+		"require_authorization": true,
+		"args": {
+			"x": "<class 'int'>",
+			"y": "<class 'int'>"
+		}
+	},
+	"mov3d": {
+		"require_authorization": false,
+		"args": {
+			"dt": "<class 'float'>",
+			"r0": "<class 'list'>",
+			"v0": "<class 'list'>",
+			"mass": "<class 'float'>",
+			"radius": "<class 'float'>",
+			"drag": "<class 'bool'>"
+		}
+	},
+	"tadd": {
+		"require_authorization": false,
+		"args": {
+			"x": "<class 'int'>",
+			"y": "<class 'int'>"
+		}
+	}
+}
+```
+
+### /task
 
 Method: ```POST```
 
@@ -100,7 +163,7 @@ Example of request (task of type "add"):
 Parameters:
 ```json
 {
-    "type":"add",
+    "type": "add",
     "args": {
       "x": 1,
       "y": 2
@@ -109,7 +172,7 @@ Parameters:
 ```
 
 ```bash
-curl -X POST localhost:5000/task/new -H 'Content-Type: application/json' -d '{"type":"add", "args":{"x": 1, "y": 2}}'
+curl -X POST localhost:5000/task -H 'Content-Type: application/json' -d '{"type":"add", "args":{"x": 1, "y": 2}}'
 ```
 
 Example of response:
@@ -156,6 +219,11 @@ If you pass an argument that is not required, then it will return an error:
 }
 ```
 
+To post a task which type needs authorization, pass the Authorization header as following:
+```bash
+curl -X GET localhost:5000/protected -H "Authorization: Bearer <YOUR_JWT_TOKEN>" -H 'Content-Type: application/json' -d '{"type":"myProtectedTask", "args":{"x": 1, "y": 2}}'
+```
+
 You can also use the example task "mov3d" for testing purposes, which will simulate the trajectory of a particle:
 
 Parameters:
@@ -197,7 +265,7 @@ Where the "result" will contain the following:
 }
 ```
 
-### /task/```<task_id>```/view
+### /task/```<task_id>```
 
 Method: ```GET```
 
@@ -208,7 +276,7 @@ Example of request:
 Parameters: ```<task_id>```
 
 ```bash
-curl -X GET localhost:5000/task/5861c3a8-fa0f-4b84-9e54-04b545408114/view
+curl -X GET localhost:5000/task/5861c3a8-fa0f-4b84-9e54-04b545408114
 ```
 
 Example of response:
