@@ -1,0 +1,36 @@
+site_name: "pytasks"
+
+theme:
+  name: "material"
+  features:
+    - content.code.copy
+nav:
+  - Introduction: index.md
+  - Setiing up: setup.md
+  - API:
+    - Introduction: api.md
+    - Specification: api.specification.md
+  - Handler:
+    - Introduction: handler.md
+  - Reference:
+    - release/3:
+      - api.reference.md
+      - taskpacks.manager.manager.reference.md
+    - release/2:
+      - Documentation: release2-doc.md
+plugins:
+  - include-markdown
+  - search
+  - mkdocstrings
+markdown_extensions:
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

@@ -16,6 +16,11 @@ api.add_resource(GenerateTokenForUser, '/token')
 
 @app.route('/')
 def documentation():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     return "You can view the server-end documentation on <a href='https://github.com/brenopelegrin/flask-tasks-docker/'>GitHub.</a>"
 
 if __name__ == '__main__':
