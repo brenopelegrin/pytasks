@@ -1,6 +1,6 @@
 FROM python:3.10-slim-bullseye
 COPY . /app
-ENV DATABASE_URL postgres://postgres:123@localhost:5432/flask_tasks_v2
+ENV DATABASE_URL postgres://postgres:password@localhost:5432/pytasks
 ENV AMQP_URL redis://localhost:6379
 ENV WORKER_NAME worker
 ENV ENVIRONMENT handler

@@ -28,10 +28,11 @@ services:
       - pytasks-network
   postgres:
     image: postgres
-    volumes:
-      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
     environment:
-      - POSTGRES_PASSWORD="password"
+      - POSTRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST_AUTH_METHOD=password
+      - POSTGRES_DB=pytasks
     networks:
       - pytasks-network
 networks:
