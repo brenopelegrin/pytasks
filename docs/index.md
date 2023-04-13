@@ -40,6 +40,9 @@ The project's main goal is to make cloud computing more accessible and facilitat
 
 It is based on solid and robust technologies, packages and frameworks. The API is built with [Flask](https://github.com/pallets/flask) and served with [gunicorn](https://github.com/benoitc/gunicorn). The handler is built on top of [Celery](https://github.com/celery/celery), enabling it to use various backends for the queue, such as [Redis](https://redis.io/) and [RabbitMQ](https://www.rabbitmq.com/) and various database backends for storing task results, such as [PostgreSQL](https://www.postgresql.org/).
 
+#### Overview fluxogram of pytasks
+![Overview fluxogram](img/overview_fluxogram.png)
+
 ### **What exactly is a task?**
 
 Tasks are coded functions that receives arguments and return results, obbeying **some specifications**. They can be put together in packages (which we call **taskpacks**) and automatically installed and imported on deploy.

@@ -34,13 +34,13 @@ jobs:
         with:
           context: ./api
           push: true
-          tags: brenopelegrin/flask-tasks-api:latest
+          tags: brenopelegrin/pytasks-api:latest
       -
         name: 🚀 Build and push Handler
         uses: docker/build-push-action@v3
         with:
           context: ./handler
           push: true
-          tags: brenopelegrin/flask-tasks-handler:latest
+          tags: brenopelegrin/pytasks-handler:latest
           
 

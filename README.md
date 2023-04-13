@@ -1,4 +1,4 @@
-# pytasks
+![pytasks logo](https://github.com/brenopelegrin/pytasks/blob/master/docs/img/pytasks.png?raw=true)
 
 **pytasks** is a complete and customizable microservice for running computational tasks on remote machines and viewing its results through an API. 
 
