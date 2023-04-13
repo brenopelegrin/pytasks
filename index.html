@@ -244,6 +244,19 @@
     Overview
   </a>
   
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview-fluxogram-of-pytasks" class="md-nav__link">
+    Overview fluxogram of pytasks
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -603,6 +616,19 @@
     Overview
   </a>
   
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#overview-fluxogram-of-pytasks" class="md-nav__link">
+    Overview fluxogram of pytasks
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -672,6 +698,8 @@
 <p>The project's main goal is to make cloud computing more accessible and facilitate its implementation.</p>
 <p><code>pytasks</code> provides a complete and customizable backend so that developers only have to worry about developing the tasks, not the backend that runs them.</p>
 <p>It is based on solid and robust technologies, packages and frameworks. The API is built with <a href="https://github.com/pallets/flask">Flask</a> and served with <a href="https://github.com/benoitc/gunicorn">gunicorn</a>. The handler is built on top of <a href="https://github.com/celery/celery">Celery</a>, enabling it to use various backends for the queue, such as <a href="https://redis.io/">Redis</a> and <a href="https://www.rabbitmq.com/">RabbitMQ</a> and various database backends for storing task results, such as <a href="https://www.postgresql.org/">PostgreSQL</a>.</p>
+<h4 id="overview-fluxogram-of-pytasks">Overview fluxogram of pytasks</h4>
+<p><img alt="Overview fluxogram" src="img/overview_fluxogram.png" /></p>
 <h3 id="what-exactly-is-a-task"><strong>What exactly is a task?</strong></h3>
 <p>Tasks are coded functions that receives arguments and return results, obbeying <strong>some specifications</strong>. They can be put together in packages (which we call <strong>taskpacks</strong>) and automatically installed and imported on deploy.
 The tasks need to have defined arguments with declared types, and the results should be serializable in JSON. </p>
