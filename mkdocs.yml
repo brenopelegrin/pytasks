@@ -12,6 +12,11 @@ nav:
     - Specification: api.specification.md
   - Handler:
     - Introduction: handler.md
+  - Contributing:
+    - Taskpacks: 
+      - Creating your own taskpack: taskpacks.howtocreate.md
+    - On GitHub:
+      - How to contribute: project.contributing.md
   - Reference:
     - release/3:
       - api.reference.md
