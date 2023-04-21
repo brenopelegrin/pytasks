@@ -29,3 +29,14 @@ docker compose up -d
 After the containers start, the API will be available at ``http://localhost:8080``.
 
 💡  For more instructions on how to customize your ``pytasks`` containers and how to run them, see [Setting up](https://brenopelegrin.github.io/pytasks/setup).
+
+### **Overview**
+
+The project's main goal is to make cloud computing more accessible and facilitate its implementation.
+
+``pytasks`` provides a complete and customizable backend so that developers only have to worry about developing the tasks, not the backend that runs them.
+
+It is based on solid and robust technologies, packages and frameworks. The API is built with [Flask](https://github.com/pallets/flask) and served with [gunicorn](https://github.com/benoitc/gunicorn). The handler is built on top of [Celery](https://github.com/celery/celery), enabling it to use various backends for the queue, such as [Redis](https://redis.io/) and [RabbitMQ](https://www.rabbitmq.com/) and various database backends for storing task results, such as [PostgreSQL](https://www.postgresql.org/).
+
+#### Overview fluxogram of pytasks
+![Overview fluxogram](https://github.com/brenopelegrin/pytasks/blob/master/docs/img/overview_fluxogram.png?raw=true)
