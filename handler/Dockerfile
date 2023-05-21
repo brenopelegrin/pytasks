@@ -1,5 +1,6 @@
 FROM python:3.10-slim-bullseye
 COPY . /app
+ARG pytasks_taskpacks_manager_INSTALL_PACKAGES
 ENV DATABASE_URL postgres://postgres:password@localhost:5432/pytasks
 ENV AMQP_URL redis://localhost:6379
 ENV WORKER_NAME worker

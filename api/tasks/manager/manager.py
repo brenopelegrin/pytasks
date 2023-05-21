@@ -122,7 +122,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     if(envInstallPackages != None):
+        if('*' in envInstallPackages):
+            console.print(f"[yellow]:warning: (manager) Detected [yellow bold]WILDCARD on env variable pytasks_taskpacks_manager_INSTALL_PACKAGES.[yellow] ALL command-line installs will be ignored and only env variable installs will be considered.")
+            args.installs = []
+            envInstallPackages.replace('*', '')
+
         listOfPackages = envInstallPackages.split(",")
+
         toBeInstalled = []
         console.print(f"[yellow](manager) Detected env variable with installs [bold yellow](pytasks_taskpacks_manager_INSTALL_PACKAGES)[yellow] containing the following packages: {listOfPackages}")
         for package in listOfPackages:
