@@ -125,7 +125,7 @@ if __name__ == '__main__':
         if('*' in envInstallPackages):
             console.print(f"[yellow]:warning: (manager) Detected [yellow bold]WILDCARD on env variable pytasks_taskpacks_manager_INSTALL_PACKAGES.[yellow] ALL command-line installs will be ignored and only env variable installs will be considered.")
             args.installs = []
-            envInstallPackages.replace('*', '')
+            envInstallPackages = envInstallPackages.replace('*', '')
 
         listOfPackages = envInstallPackages.split(",")
 
