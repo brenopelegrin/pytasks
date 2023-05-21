@@ -10,5 +10,11 @@
         "author": "brenopelegrin",
         "version": "1.0",
         "link": "https://github.com/brenopelegrin/pytasks-test/archive/refs/heads/master.zip"
+    },
+    "whisper": {
+        "name": "whisper",
+        "author": "brenopelegrin",
+        "version": "1.0",
+        "link": "https://github.com/brenopelegrin/pytasks-whisper/archive/refs/heads/taskpack-dist.zip"
     }
 }
