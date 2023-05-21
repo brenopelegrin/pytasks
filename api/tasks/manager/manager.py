@@ -107,7 +107,7 @@ def install(packages, context, console):
 
 if __name__ == '__main__':
     console = Console()
-    envInstallPackages = os.getenv('pytasks.taskpacks.manager.INSTALL_PACKAGES') 
+    envInstallPackages = os.getenv('pytasks_taskpacks_manager_INSTALL_PACKAGES') 
     parser = argparse.ArgumentParser(
         prog="manager",
         description="package manager for flask-tasks-docker")
@@ -124,12 +124,12 @@ if __name__ == '__main__':
     if(envInstallPackages != None):
         listOfPackages = envInstallPackages.split(",")
         toBeInstalled = []
-        console.print(f"[yellow](manager) Detected env variable with installs [bold yellow](pytasks.taskpacks.manager.INSTALL_PACKAGES)[yellow] containing the following packages: {listOfPackages}")
+        console.print(f"[yellow](manager) Detected env variable with installs [bold yellow](pytasks_taskpacks_manager_INSTALL_PACKAGES)[yellow] containing the following packages: {listOfPackages}")
         for package in listOfPackages:
             if package not in args.installs:
                 toBeInstalled.append(package)
                 args.installs.append(package)
-        console.print(f"[yellow](manager) Pakcages from [bold yellow](pytasks.taskpacks.manager.INSTALL_PACKAGES)[yellow] env variable added to installs list: {toBeInstalled}")
+        console.print(f"[yellow](manager) Pakcages from [bold yellow](pytasks_taskpacks_manager_INSTALL_PACKAGES)[yellow] env variable added to installs list: {toBeInstalled}")
                 
     currentContext = {
         "officialPackagesManifest": {} ,
