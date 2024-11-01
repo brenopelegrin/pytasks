@@ -1,6 +1,6 @@
 services:
   api:
-    image: brenopelegrin/pytasks-api:latest
+    image: brenopelegrin/pytasks-api:magalu
     env_file:
       - ./api.env
     ports:
@@ -14,7 +14,7 @@ services:
       - JWT_PRIVATE_PEM
       - JWT_PUBLIC_PEM
   handler:
-    image: brenopelegrin/pytasks-handler:latest
+    image: brenopelegrin/pytasks-handler:magalu
     env_file:
       - ./handler.env
     depends_on:

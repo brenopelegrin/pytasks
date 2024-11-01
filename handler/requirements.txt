@@ -4,3 +4,5 @@ Redis==4.4.0
 psycopg2-binary==2.9.5
 importlib-metadata==4.13.0
 rich==13.3.3
+yt_dlp==2024.10.22
+faster_whisper==1.0.3
