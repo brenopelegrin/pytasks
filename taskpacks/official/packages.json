@@ -16,5 +16,11 @@
         "author": "brenopelegrin",
         "version": "1.0",
         "link": "https://github.com/brenopelegrin/pytasks-whisper/archive/refs/heads/taskpack-dist.zip"
+    },
+    "subtitles": {
+        "name": "subtitles",
+        "author": "brenopelegrin",
+        "version": "1.0",
+        "link": "https://github.com/brenopelegrin/pytasks-subtitles/archive/refs/heads/main.zip"
     }
 }
