@@ -1,3 +1,5 @@
+import logging
+
 class AuthorizedTasks:
     def __init__(self):
         self.list = {}
@@ -9,8 +11,9 @@ class AuthorizedTasks:
 authorizedTasks = AuthorizedTasks()
 
 def authorized_task(task_func):
+    logger = logging.getLogger()
     if task_func not in authorizedTasks.list:
-        print(f"task {task_func.__name__} is authorized")
+        logging.info(f"task {task_func.__name__} is authorized")
         authorizedTasks.register_task(task_func)
     def wrapper(*args, **kwargs):
         return task_func(*args, **kwargs)

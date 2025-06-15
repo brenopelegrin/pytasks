@@ -1,5 +1,6 @@
 services:
   api:
+    build: ./api
     image: brenopelegrin/pytasks-api:latest
     env_file:
       - ./api.env
@@ -14,6 +15,7 @@ services:
       - JWT_PRIVATE_PEM
       - JWT_PUBLIC_PEM
   handler:
+    build: ./handler
     image: brenopelegrin/pytasks-handler:latest
     env_file:
       - ./handler.env

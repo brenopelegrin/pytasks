@@ -1,15 +1,16 @@
 from functools import wraps
-from flask import request
-from flask_restful import abort
 import jwt
 import os
-from datetime import datetime, timezone
 import calendar
 import logging
-logger = logging.getLogger('gunicorn.error')
-
+from datetime import datetime, timezone
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
+
+from flask import request
+from flask_restx import abort
+
+logger = logging.getLogger('gunicorn.error')
 
 class AuthorizedTasks:
     """

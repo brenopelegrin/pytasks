@@ -1,21 +1,32 @@
-from flask_restful import reqparse, abort, Api, Resource
+import werkzeug
+import os
+import inspect
+
+from flask import jsonify, render_template, make_response, render_template_string
+from flask_restx import reqparse, abort, Api, Resource
 from webargs import fields, validate
 from webargs.flaskparser import use_kwargs, parser
-from flask import jsonify, render_template, make_response, render_template_string
-import werkzeug
-from server import frontend_url
-import os
 from celery.result import AsyncResult
-from resources.auth import require_jwt, generate_new_jwt, decrypt_jwt_authorization_header, verify_credentials, get_user_permissions, abort_if_authorization_header_not_present, abort_if_jwt_is_invalid
+
+from server import frontend_url, api
+from resources.auth import (
+    require_jwt,
+    generate_new_jwt,
+    decode_jwt_authorization_header,
+    verify_credentials,
+    get_user_permissions,
+    abort_if_authorization_header_not_present,
+    abort_if_jwt_is_invalid,
+    authorizedTasks
+)
+
+
+from celeryapp import celery_app as capp
+celery_tasks = capp.tasks
 
 #######################################################
 #       Collect task list, args and arg types
 #######################################################
-from celeryapp import celery_app as capp
-from resources.auth import authorizedTasks
-import inspect
-celery_tasks = capp.tasks
-
 def collect_tasks(celery_task_list):
     tasklist = {}
     for name in celery_task_list.keys():
@@ -43,7 +54,7 @@ def abort_if_credentials_are_invalid(user, password):
 def abort_if_doesnt_have_permission(tasktype, auth_header):
     if(tasktype in authorizedTasks.list):
         if(auth_header):
-            decrypted_payload = decrypt_jwt_authorization_header(auth_header)
+            decrypted_payload = decode_jwt_authorization_header(auth_header)
             try:
                 task_permission = decrypted_payload['allowed_tasks'][tasktype]
             except:
@@ -82,6 +93,7 @@ class NewTask(Resource):
     """
     Registers a new task request through POST method.
     """
+    
     def post(self):
         """Posts a task 
 
@@ -93,7 +105,7 @@ class NewTask(Resource):
         parser.add_argument('args', required=True, type=dict, help='You need to inform args dict', location='json')
         parser.add_argument('Authorization', location='headers')
         args = parser.parse_args()
-
+        
         abort_if_tasktype_doesnt_exist(tasktype=args["type"])
         abort_if_doesnt_have_permission(tasktype=args["type"], auth_header=args["Authorization"])
         abort_if_task_params_are_invalid(tasktype=args["type"], given_params=args["args"])
@@ -101,9 +113,9 @@ class NewTask(Resource):
         try:
             task_class = tasklist[args["type"]]['task']
             task = task_class.delay(**args["args"])
-            return {"id": task.id, "type": args["type"], "status": task.state}
+            return {"id": task.id, "type": args["type"], "status": task.state}, 200
         except Exception as exc:
-            return{"error": str(exc)}
+            abort(500, message=f'error when executing task: {str(exc)}')
 
 class ViewTask(Resource):
     def get(self, task_id):
