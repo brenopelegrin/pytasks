@@ -88,19 +88,19 @@ def generate_new_jwt(payload: dict):
         return(jwt.encode(payload, jwt_private_pem, algorithm=jwt_algorithm), 'infinity')
 
 def abort_if_authorization_header_not_present():
-    abort(401, message=f'This endpoint requires the "Authentication: Bearer JWT_token" header.')
+    abort(401, message="This endpoint requires the 'Authentication: Bearer JWT_token' header.")
 
 def abort_if_jwt_is_expired():
-    abort(401, message=f'This token signature has expired.')
+    abort(401, message='This token signature has expired.')
 
 def abort_if_jwt_is_invalid():
-    abort(401, message=f'This token is invalid')
+    abort(401, message='This token is invalid')
 
-def abort_if_jwt_is_invalid_signature():
-    abort(401, message=f'This token has invalid signature.')
+def abort_if_jwt_has_invalid_signature():
+    abort(401, message='This token has invalid signature.')
 
 def abort_if_jwt_unexpected_error():
-    abort(401, message=f'An unexpected error occured during JWT decryption.')
+    abort(401, message='An unexpected error occured during JWT decryption.')
 
 def get_user_permissions(user:str, password:str):
     """
@@ -147,24 +147,30 @@ def verify_credentials(user:str, password:str):
     else:
         return False
 
-def decrypt_jwt_authorization_header(auth_header):
-    token = auth_header
+def decode_jwt_authorization_header(auth_header):
+    """Decodes the authorization header to get the JWT
     
+    Args:
+        auth_header (str): authorization header.
+    
+    Returns:
+        dict: the decoded JWT
+    """
+    token = auth_header
     if 'Bearer' in token:
-
         token = token.split()[1]
         try:
             decoded = jwt.decode(token, jwt_public_pem, algorithms=[jwt_algorithm], verify_signature=True)
             return decoded
 
+        except jwt.InvalidSignatureError:
+            abort_if_jwt_has_invalid_signature()
         except jwt.ExpiredSignatureError:
             abort_if_jwt_is_expired()
         except jwt.InvalidTokenError:
             abort_if_jwt_is_invalid()
-        except jwt.InvalidSignatureError:
-            abort_if_jwt_is_invalid_signature()
         except Exception as err:
-            print(f"Unexpected error {err}, with type {type(err)}")
+            logger.error(f"Unexpected error {err}, with type {type(err)}")
             abort_if_jwt_unexpected_error()
     else:
         abort_if_jwt_is_invalid()
@@ -182,15 +188,15 @@ def require_jwt(func):
                     decoded = jwt.decode(token, jwt_public_pem, algorithms=[jwt_algorithm], verify_signature=True)
                     return func(decoded_payload=decoded, *args, **kwargs)
 
+                except jwt.InvalidSignatureError:
+                    abort_if_jwt_has_invalid_signature()
                 except jwt.ExpiredSignatureError:
                     abort_if_jwt_is_expired()
                 except jwt.InvalidTokenError:
                     abort_if_jwt_is_invalid()
-                except jwt.InvalidSignatureError:
-                    abort_if_jwt_is_invalid_signature()
                 except Exception as err:
-                    print(f"Unexpected error {err}, with type {type(err)}")
-                    abort_if_jwt_inexpected_error()
+                    logger.error(f"Unexpected error {err}, with type {type(err)}")
+                    abort_if_jwt_unexpected_error()
             else:
                 abort_if_jwt_is_invalid()
         else:

@@ -1,21 +1,24 @@
+from glob import glob
+import os
+import logging
+
 def init(celery_app, **global_decorators):
-    from glob import glob
-    import os
+    logger = logging.getLogger()
     paths = glob('./tasks/packs/*')
-    availablePackages = []
+    available_packages = []
     for path in paths:
         if os.path.isdir(path) and '__pycache__' not in path:
-            packageName = path.replace('./tasks/packs/', '')
+            package_name = path.replace('./tasks/packs/', '')
 
             if(not os.path.isfile(path+'/installed.lock')):
-                print(f"[package] package '{packageName}' doesn't have 'installed.lock' file -> ignoring the package.")
+                logger.warning(f"[package] package '{package_name}' doesn't have 'installed.lock' file -> ignoring the package.")
             else:
-                print(f"[package] package '{packageName}' has 'installed.lock' file -> loading the package.")
-                if(packageName not in availablePackages):
-                    availablePackages.append(packageName)
+                logger.info(f"[package] package '{package_name}' has 'installed.lock' file -> loading the package.")
+                if(package_name not in available_packages):
+                    available_packages.append(package_name)
                 else:
-                    printf(f"[package] there is already a package named {moduleName}, package name must be unique -> only the first package named '{moduleName}' will be loaded")
+                    logger.info(f"[package] there is already a package named {package_name}, package name must be unique -> only the first package named '{package_name}' will be loaded")
     
-    for package in availablePackages:
+    for package in available_packages:
         exec(f"import tasks.packs.{package} as {package}")
         exec(f"{package}.init(celery_app, **global_decorators)")
