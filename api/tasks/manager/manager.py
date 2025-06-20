@@ -8,7 +8,7 @@ from zipfile import ZipFile
 
 from rich.console import Console
 
-official_packages_url = 'https://raw.githubusercontent.com/brenopelegrin/pytasks/master/taskpacks/official/packages.json'
+official_packages_url = 'https://raw.githubusercontent.com/brenopelegrin/pytasks/deploy-soicmc/taskpacks/official/packages.json'
 
 def install(packages, context, console):
     """_summary_
