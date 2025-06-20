@@ -22,5 +22,11 @@
         "author": "brenopelegrin",
         "version": "1.0",
         "link": "https://github.com/brenopelegrin/pytasks-subtitles/archive/refs/heads/main.zip"
+    },
+    "soicmc": {
+        "name": "soicmc",
+        "author": "brenopelegrin",
+        "version": "1.0",
+        "link": "https://github.com/brenopelegrin/pytasks-soicmc/archive/refs/heads/main.zip"
     }
 }
