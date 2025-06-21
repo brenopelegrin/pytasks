@@ -1,7 +1,7 @@
 services:
   api:
     build: ./api
-    image: brenopelegrin/pytasks-api:latest
+    image: so-icmc/pytasks-api:latest
     env_file:
       - ./api.env
     ports:
@@ -16,7 +16,7 @@ services:
       - JWT_PUBLIC_PEM
   handler:
     build: ./handler
-    image: brenopelegrin/pytasks-handler:latest
+    image: so-icmc/pytasks-handler:latest
     env_file:
       - ./handler.env
     depends_on:

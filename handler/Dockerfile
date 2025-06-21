@@ -7,7 +7,8 @@ ENV WORKER_NAME worker
 ENV ENVIRONMENT handler
 ENV DEFAULT_TASK_QUEUE tasks
 RUN pip install --no-cache-dir -r /app/requirements.txt
-RUN python /app/tasks/manager/manager.py -i physicsjs test soicmc --handler /app
+# For this project, we are shipping packages with the container using COPY instead of installing it on build time
+#RUN python /app/tasks/manager/manager.py -i physicsjs test soicmc --handler /app
 WORKDIR /app
 RUN cd /app
 ENTRYPOINT celery --app=celeryapp worker --loglevel=INFO --hostname=$WORKER_NAME@%h

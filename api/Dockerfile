@@ -8,7 +8,8 @@ ENV GUNICORN_WORKERS 3
 ENV GUNICORN_THREADS 2
 EXPOSE 8080
 RUN pip install --no-cache-dir -r /app/requirements.txt
-RUN python /app/tasks/manager/manager.py -i physicsjs test soicmc --api /app
+# For this project, we are shipping packages with the container using COPY instead of installing it on build time
+#RUN python /app/tasks/manager/manager.py -i physicsjs test soicmc --api /app
 WORKDIR /app
 ENTRYPOINT gunicorn --conf /app/gunicorn.conf.py app:app
 
